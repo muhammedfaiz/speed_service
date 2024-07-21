@@ -1,7 +1,7 @@
 import { createUser, expireOtp, getUserByEmail,getUserById } from "../services/userServices.js";
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { generateOtp, sendOtp } from "../utils/utils.js";
+import {  generateAccessToken, generateOtp, generateRefreshToken, sendOtp } from "../utils/utils.js";
+import jwt from 'jsonwebtoken';
 
 const userRegister = async(req,res)=>{
     try {
@@ -19,7 +19,7 @@ const userRegister = async(req,res)=>{
         setTimeout(async()=>{
             await expireOtp(user._id);
         },60000)
-        res.status(200).json({id:user._id,name:user.name,email:user.email,phone:user.phone,otpSent:true});
+        res.status(200).json({user:{id:user._id,name:user.name,email:user.email,phone:user.phone,otpSent:true}});
     } catch (error) {
         res.status(409).json({message:error.message});
     }
@@ -35,12 +35,13 @@ const userLogin = async (req, res) => {
             if(!user||!bcrypt.compareSync(password,user.password)){
                 throw new Error("Invalid email or password");
             }
-            if(!user.status){
+            if(!user.status){           
                 throw new Error("User is not active");
             }
-            const token = jwt.sign({id:user._id,name:user.name},process.env.JWT_SECRET,{expiresIn:'20m'});
-            res.cookie("token",token,{expiresIn:'20m'});
-            res.status(200).json({id:user._id,name:user.name,email:user.email,phone:user.phone});
+            const accessToken = generateAccessToken({id:user._id});
+            const refreshToken = generateRefreshToken({id:user._id});
+            res.cookie('refreshToken', refreshToken, { httpOnly: true,secure:true,sameSite:'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
+            res.status(200).json({user:{id:user._id,name:user.name,email:user.email,phone:user.phone},token:accessToken});
         }
 
     } catch (error) {
@@ -58,7 +59,10 @@ const verifyOtp=async(req,res)=>{
         user.isVerified = true;
         user.otp = null;
         await user.save();
-        res.status(200).json({id:user._id,name:user.name,email:user.email,phone:user.phone,status:user.status,isVerified:user.isVerified})
+        const accessToken = generateAccessToken({id:user._id});
+        const refreshToken = generateRefreshToken({id:user._id});
+        res.cookie('refreshToken', refreshToken, { httpOnly: true,secure:true,sameSite:'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
+        res.status(200).json({user:{id:user._id,name:user.name,email:user.email,phone:user.phone,status:user.status,isVerified:user.isVerified},token:accessToken});
     }catch(error){
         res.status(500).json({message:error.message});
     }
@@ -85,4 +89,37 @@ const resendOtp=async(req,res)=>{
     }
 }
 
-export {userRegister,userLogin,verifyOtp,resendOtp};
+ const refreshAccessToken = async(req,res)=>{
+    try {
+        const {refreshToken} = req.cookies;
+        console.log("entered change");
+        if(!refreshToken){
+            return res.status(403).json({message:"Authorization failed"});
+        }
+        jwt.verify(refreshToken,process.env.JWT_REFRESH_SECRET,(err,user)=>{
+            if(err){
+                return res.status(403).json({message:"Invalid refresh token"});
+            }
+            const newAccessToken = generateAccessToken({id:user.id});
+            res.status(200).json({accessToken:newAccessToken});
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({message:error.message});
+    }
+}
+
+const userLogout = async(req,res)=>{
+    try {
+        const {refreshToken}=req.cookies;
+        if(!refreshToken){
+            return res.status(403).json({message:"Authorization failed"});
+        }
+        res.clearCookie("refreshToken",{httpOnly: true,secure:true,sameSite:'None',path:'/'});
+        res.status(200).json({message:"Logged out successfully"});
+    } catch (error) {
+        res.status(500).json({ message: 'Logout failed', error });
+    }
+}
+
+export {userRegister,userLogin,verifyOtp,resendOtp,userLogout,refreshAccessToken};

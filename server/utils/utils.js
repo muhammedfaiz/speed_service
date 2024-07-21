@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import jwt from 'jsonwebtoken'; 
 
 export const generateOtp = ()=>{
     return Math.floor(100000+Math.random()*900000).toString();
@@ -29,4 +30,12 @@ export const sendOtp = async (email,otp)=>{
         console.log(error);
         throw new Error('Error sending otp ',error.message);
     }
+}
+
+export const generateAccessToken=(data)=>{
+    return jwt.sign(data, process.env.JWT_SECRET, { expiresIn: '15m' });
+}
+
+export const generateRefreshToken=(data)=>{
+    return jwt.sign(data, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 }
