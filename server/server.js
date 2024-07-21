@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connect from './config/db.js';
 import userRouter from './routes/userRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
 import cookieParser from 'cookie-parser';
 dotenv.config();
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // routes
 app.use("/api/user",userRouter);
+app.use("/api/admin",adminRouter);
 app.options('*', cors());
 app.listen(PORT,()=>{console.log("Server connected to port "+PORT)});
 

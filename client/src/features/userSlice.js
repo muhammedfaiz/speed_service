@@ -58,7 +58,7 @@ export const logout = createAsyncThunk("user/logout", async (_, thunkApi) => {
   }
 });
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {

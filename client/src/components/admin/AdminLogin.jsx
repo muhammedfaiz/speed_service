@@ -1,56 +1,57 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../features/userSlice";
+import { useNavigate } from "react-router-dom"
+import { adminLogin } from "../../features/adminSlice";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
+const AdminLogin = () => {
+    const [email,setEmail]=useState();
+    const [password,setPassword]=useState();
+    const [errors,setErrors]=useState({});
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const {error,isSuccess}=useSelector(store=>store.user);
-  function validation() {
-    let errors = {};
-    if (!email) {
-      errors.email = "Email is required";
-    }
-    if (!password) {
-      errors.password = "Password is required";
-    }
-    if (email && !/^\S+@\S+\.\S+$/i.test(email)) {
-      errors.email = "Invalid email format";
-    }
-    if (password && password.length < 6) {
-      errors.password = "Password must be at least 6 characters long";
-    }
-    return errors;
-  }
-
-  const handleSubmit = () => {
-      const validationError=validation();
-      if(Object.keys(validationError).length>0){
-        setErrors(validationError);
-        return;
-      }else{
-        setErrors({});
-        dispatch(login({email,password}));
+    const dispatch = useDispatch();
+    const {error,isSuccess,admin}=useSelector(store=>store.admin);
+    const navigate = useNavigate();
+    function validation() {
+        let errors = {};
+        if (!email) {
+          errors.email = "Email is required";
+        }
+        if (!password) {
+          errors.password = "Password is required";
+        }
+        if (email && !/^\S+@\S+\.\S+$/i.test(email)) {
+          errors.email = "Invalid email format";
+        }
+        if (password && password.length < 6) {
+          errors.password = "Password must be at least 6 characters long";
+        }
+        return errors;
       }
-  };
 
-  useEffect(()=>{
-    if(isSuccess){
-        navigate("/");
+    const handleSubmit = ()=>{
+        const validationErrors = validation();
+        if(Object.keys(validationErrors).length>0){
+            setErrors(validationErrors);
+            return;
+        }else{
+            setErrors({});
+            dispatch(adminLogin({email,password}));
+        }
     }
-  },[isSuccess,navigate]);
+
+    useEffect(()=>{
+        if(isSuccess && admin){
+            navigate("/admin/dashboard");
+        }
+    },[isSuccess,navigate,admin])
+
   return (
     <div className="flex flex-col w-full max-w-md px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10">
       <div className="self-center mb-6 text-xl font-light text-gray-600 sm:text-2xl dark:text-white">
-        Login To Your Account
+        Admin Login
       </div>
       <div className="mt-8">
-      {error && <p className="text-red-500 text-base mb-2">{error.message}</p>}
+      {error && <p className="text-red-500 text-base mb-2">{error}</p>}
         <div className="flex flex-col mb-2">
             {errors.email && <p className="text-red-500 text-xs mb-1">{errors.email}</p>}
           <div className="flex relative ">
@@ -75,16 +76,6 @@ const Login = () => {
             />
           </div>
         </div>
-        <div className="flex items-center mb-6 -mt-4">
-          <div className="flex ml-auto">
-            <Link
-              to="/forget-password"
-              className="inline-flex text-xs font-thin text-gray-500 sm:text-sm dark:text-gray-100 hover:text-gray-700 dark:hover:text-white"
-            >
-              Forgot Your Password?
-            </Link>
-          </div>
-        </div>
         <div className="flex w-full">
           <button
             type="submit"
@@ -95,15 +86,8 @@ const Login = () => {
           </button>
         </div>
       </div>
-      <div className="flex items-center justify-center mt-6">
-        <Link
-          to="/signup"
-          className="inline-flex items-center text-xs font-thin text-center text-gray-500 hover:text-gray-700 dark:text-gray-100 dark:hover:text-white"
-        >
-          <span className="ml-2">You don&#x27;t have an account?</span>
-        </Link>
-      </div>
+      
     </div>
-  );
-};
-export default Login;
+  )
+}
+export default AdminLogin

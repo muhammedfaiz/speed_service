@@ -92,7 +92,6 @@ const resendOtp=async(req,res)=>{
  const refreshAccessToken = async(req,res)=>{
     try {
         const {refreshToken} = req.cookies;
-        console.log("entered change");
         if(!refreshToken){
             return res.status(403).json({message:"Authorization failed"});
         }
