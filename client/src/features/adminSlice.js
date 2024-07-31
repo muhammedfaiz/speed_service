@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {login, logout} from '../services/adminService.js';
+import { login, logout} from '../services/adminService.js';
 
 const initialState = {
     admin:JSON.parse(localStorage.getItem('admin'))||null,
@@ -26,6 +26,8 @@ export const adminLogout = createAsyncThunk('admin/logout',async(_,thunkApi)=>{
 });
 
 
+
+
 const adminSlice = createSlice({
     name:"admin",
     initialState,
@@ -40,7 +42,7 @@ const adminSlice = createSlice({
             state.token = action.payload.token;
             state.isSuccess = true;
             state.error=null;
-            localStorage.setItem('access_token', action.payload.token);
+            localStorage.setItem('admin_access_token', action.payload.token);
             localStorage.setItem('admin', JSON.stringify(action.payload.admin));
         })
         .addCase(adminLogin.rejected,(state,action)=>{
@@ -57,7 +59,7 @@ const adminSlice = createSlice({
             state.token = null;
             state.isSuccess = true;
             state.error=null;
-            localStorage.removeItem('access_token');
+            localStorage.removeItem('admin_access_token');
             localStorage.removeItem('admin');
         })
         .addCase(adminLogout.rejected,(state,action)=>{
@@ -65,6 +67,7 @@ const adminSlice = createSlice({
             state.error = action.payload;
             state.isSuccess = false;
         })
+        
     }
 })
 
