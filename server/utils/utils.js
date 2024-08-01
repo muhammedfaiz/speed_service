@@ -76,3 +76,7 @@ export const sendEmployeeCode=async(data)=>{
         throw new Error('Error sending employee code ',error.message);
     }
 }
+
+export const verifyToken = (token)=>{
+    return jwt.verify(token, process.env.JWT_SECRET);
+}

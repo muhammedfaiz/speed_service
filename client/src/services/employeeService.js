@@ -59,3 +59,31 @@ export const logoutService = async()=>{
         throw error.response.data;
     }
 }
+
+export const fetchServices = async()=>{
+    try {
+        const response = await axiosInstance.get('/services/'+localStorage.getItem("employee_access_token"));
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const acceptService = async(id)=>{
+    try {
+        const response = await axiosInstance.patch('/accept-service',{token:localStorage.getItem('employee_access_token'),id});
+        return response;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const rejectService = async(id)=>{
+    try {
+
+        const response = await axiosInstance.patch('/reject-service',{token:localStorage.getItem('employee_access_token'),id});
+        return response;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
