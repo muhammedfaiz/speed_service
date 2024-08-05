@@ -1,5 +1,5 @@
 import express from 'express';
-import { acceptApplication, addCategory, addNewService, adminLogin, adminLogout, adminRegistration, changeEmployeeStatus, changeUserStatus, deleteApplication, deleteCategory, deleteService, getAllCategories, getAllUsers, getApplications, getEmployee, getServiceData, getServices, updateServiceData } from '../controllers/adminController.js';
+import { acceptApplication, addCategory, addNewService, adminLogin, adminLogout, adminRefreshToken, adminRegistration, changeEmployeeStatus, changeUserStatus, deleteApplication, deleteCategory, deleteService, getAllCategories, getAllUsers, getApplications, getEmployee, getServiceData, getServices, updateServiceData } from '../controllers/adminController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post('/register',adminRegistration);
 router.post('/login',adminLogin);
+router.post("/refreshToken",adminRefreshToken);
 router.post("/logout",authMiddleware,adminLogout);
 router.get("/users",authMiddleware,getAllUsers);
 router.patch('/changeUserStatus',authMiddleware,changeUserStatus);

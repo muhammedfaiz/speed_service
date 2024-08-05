@@ -20,6 +20,7 @@ import EmployeeAuth from "./components/employee/EmployeeAuth";
 import EmployeeList from "./pages/admin/EmployeeList";
 import ServicePage from "./pages/admin/ServicePage";
 import EmployeeServices from "./pages/employee/EmployeeServices";
+import ServiceBookingPage from "./pages/user/ServiceBookingPage";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
       <Route path="/signup" element={<RegisterationPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<HomePage/>}/>
+      <Route path="/service/:id" element={<ServiceBookingPage/>}/>
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLoginPage />} />

@@ -1,6 +1,6 @@
-import { createUser, expireOtp, getUserByEmail,getUserById } from "../services/userServices.js";
+import { createUser, expireOtp, getUserByEmail,getUserById, getUserServicesData, serviceDataHelper } from "../services/userServices.js";
 import bcrypt from 'bcryptjs';
-import {  generateAccessToken, generateOtp, generateRefreshToken, sendOtp } from "../utils/utils.js";
+import {  generateAccessToken, generateOtp, generateRefreshToken, getFile, sendOtp } from "../utils/utils.js";
 import jwt from 'jsonwebtoken';
 
 const userRegister = async(req,res)=>{
@@ -19,7 +19,7 @@ const userRegister = async(req,res)=>{
         setTimeout(async()=>{
             await expireOtp(user._id);
         },60000)
-        res.status(200).json({user:{id:user._id,name:user.name,email:user.email,phone:user.phone,otpSent:true}});
+        res.status(200).json({user:{id:user._id,name:user.name,email:user.email,otpSent:true}});
     } catch (error) {
         res.status(409).json({message:error.message});
     }
@@ -41,7 +41,7 @@ const userLogin = async (req, res) => {
             const accessToken = generateAccessToken({id:user._id});
             const refreshToken = generateRefreshToken({id:user._id});
             res.cookie('refreshToken', refreshToken, { httpOnly: true,secure:true,sameSite:'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
-            res.status(200).json({user:{id:user._id,name:user.name,email:user.email,phone:user.phone},token:accessToken});
+            res.status(200).json({user:{name:user.name,email:user.email},token:accessToken});
         }
 
     } catch (error) {
@@ -62,7 +62,7 @@ const verifyOtp=async(req,res)=>{
         const accessToken = generateAccessToken({id:user._id});
         const refreshToken = generateRefreshToken({id:user._id});
         res.cookie('refreshToken', refreshToken, { httpOnly: true,secure:true,sameSite:'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
-        res.status(200).json({user:{id:user._id,name:user.name,email:user.email,phone:user.phone,status:user.status,isVerified:user.isVerified},token:accessToken});
+        res.status(200).json({user:{name:user.name,email:user.email,isVerified:user.isVerified},token:accessToken});
     }catch(error){
         res.status(500).json({message:error.message});
     }
@@ -121,4 +121,33 @@ const userLogout = async(req,res)=>{
     }
 }
 
-export {userRegister,userLogin,verifyOtp,resendOtp,userLogout,refreshAccessToken};
+const getServices = async(req,res)=>{
+    try {
+        const data = await getUserServicesData();
+        const services = [];
+        for(let service of data){
+            let obj = {...service._doc};
+            let url = await getFile(service.image);
+            obj.imageUrl = url;
+            services.push(obj);
+        }
+        res.status(200).json({services});
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+}
+
+const serviceData = async(req,res)=>{
+    try {
+        const {id}=req.params;
+        const data = await serviceDataHelper(id);
+        const service = {...data._doc};
+        const url = await getFile(data.image);
+        service.imageUrl = url;
+        res.status(200).json({service});
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+}
+
+export {userRegister,userLogin,verifyOtp,resendOtp,userLogout,refreshAccessToken,getServices,serviceData};

@@ -23,7 +23,7 @@ const CategoryForm = () => {
     let errors = {};
     if (!form.name) {
       errors.name = "Please enter category name";
-    } else if (!/^[A-Za-z]+$/.test(form.name)) {
+    } else if (!/^[A-Za-z]+(\s+)?$/.test(form.name)) {
       errors.name = "Category name should only contain alphabets";
     }
     if (!form.image) {

@@ -20,9 +20,13 @@ import {
   userChangeStatus,
 } from "../services/adminService.js";
 import {
+  addFileToS3,
   generateAccessToken,
   generateAlphanumericValue,
   generateRefreshToken,
+  getFile,
+  randomName,
+  removeFile,
   sendEmployeeCode,
 } from "../utils/utils.js";
 import jwt from "jsonwebtoken";
@@ -152,7 +156,11 @@ export const addCategory = async (req, res) => {
   try {
     const data = req.body;
     const file = req.file;
-    const category = await addCategoryService(data, file);
+    const fileName = randomName(file);
+    const category = await addCategoryService(data, fileName);
+    if (file && category) {
+      await addFileToS3(file, fileName);
+    }
     res.status(200).json({ message: "Added Category" });
   } catch (error) {
     console.log(error);
@@ -163,6 +171,10 @@ export const addCategory = async (req, res) => {
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await getAllCategoriesService();
+    for(let category of categories){
+      const url = await getFile(category.image);
+      category.imageUrl = url;
+    }
     res.status(200).json({ categories });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -172,9 +184,10 @@ export const getAllCategories = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   try {
     const category = await getCategory(req.params.id);
-    if (category) {
-      fs.unlinkSync(path.join(__dirname, "..", "uploads", `${category.image}`));
+    if (!category) {
+      res.status(404).json({message:"Category not found"});
     }
+    await removeFile(category.image);
     const response = await deleteCategoryService(category._id);
     if (response) {
       res.status(200).json({ message: "deleted" });
@@ -187,7 +200,14 @@ export const deleteCategory = async (req, res) => {
 
 export const getApplications = async (req, res) => {
   try {
-    const applications = await getApplicationService();
+    const data = await getApplicationService();
+    const applications=[];
+    for(let application of data){
+      const obj = {...application._doc};
+      const url = await getFile(application.proof);
+      obj.proofUrl = url;
+      applications.push(obj);
+    }
     res.status(200).json({ applications });
   } catch (error) {
     console.log(error);
@@ -221,7 +241,7 @@ export const deleteApplication = async (req, res) => {
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
-    fs.unlinkSync(path.join(__dirname, "..", "uploads", application.proof));
+    await removeFile(application.proof);
     res.status(200).json({ message: "Application rejected successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -268,78 +288,95 @@ export const changeEmployeeStatus = async (req, res) => {
 
 export const addNewService = async (req, res) => {
   try {
-    const {name,price,category,description} = req.body;
-    const {filename}=req.file;
+    const { name, price, category, description } = req.body;
+    if(!req.file){
+      throw "Image required";
+    }
+    const fileName = randomName(req.file);
     const data = {
       name,
       price,
       category,
       description,
-      image: filename,
-    }
+      image: fileName,
+    };
     const result = await addServiceHelper(data);
-    if(result){
-      res.status(200).json({message:"Service added successfully"});
+    if (result && result.image) {
+      await addFileToS3(req.file, fileName);
+    }
+    if (result) {
+      res.status(200).json({ message: "Service added successfully" });
     }
   } catch (error) {
-    res.status(400).json({message:error.message});
+    res.status(400).json({ message: error.message });
   }
 };
 
-export const getServices = async (req,res)=>{
+export const getServices = async (req, res) => {
   try {
-    const services = await getServicesData();
-    res.status(200).json({services});
-  } catch (error) {
-    res.status(400).json({message:error.message});
-  }
-}
-
-export const deleteService = async(req,res)=>{
-  try {
-    const {id}=req.params;
-    const result = await deleteServiceHelper(id);
-    if(result.image){
-      fs.unlinkSync(path.join(__dirname, "..", "uploads", result.image));
+    const data = await getServicesData();
+    const services = [];
+    for(let service of data){
+      const obj = {...service._doc};
+      const url = await getFile(service.image);
+      obj.imageUrl = url;
+      services.push(obj);
     }
-    res.status(200).json({message:"Service deleted successfully"});
+    res.status(200).json({ services });
   } catch (error) {
-    res.status(400).json({message:error.message});
+    res.status(400).json({ message: error.message });
   }
-}
+};
 
-
-export const getServiceData = async(req,res)=>{
+export const deleteService = async (req, res) => {
   try {
-    const service = await serviceData(req.params.id)
-    res.status(200).json({service});
+    const { id } = req.params;
+    const result = await deleteServiceHelper(id);
+    if (result.image) {
+      await removeFile(result.image);
+    }
+    res.status(200).json({ message: "Service deleted successfully" });
   } catch (error) {
-    res.status(400).json({message:error.message});
+    res.status(400).json({ message: error.message });
   }
-}
+};
 
-
-export const updateServiceData = async (req,res)=>{
+export const getServiceData = async (req, res) => {
   try {
-    const {id}=req.params;
-    const {name,price,category,description} = req.body;
-    
+    const data = await serviceData(req.params.id);
+    const url = await getFile(data.image);
+    const service = {...data._doc};
+    service.imageUrl = url;
+    res.status(200).json({ service });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateServiceData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, category, description } = req.body;
+    let fileName;
     if(req.file){
-      const {filename}=req.file;
-      data.image=filename;
+      fileName = randomName(req.file);
+      await addFileToS3(req.file, fileName);
     }
     const data = {
       name,
       price,
       category,
       description,
+    };
+    if(fileName){
+      data.image = fileName;
     }
-    const result = await updateServiceHelper(id,data);
-    if(data.image && result.image){
-      fs.unlinkSync(path.join(__dirname, "..", "uploads", result.image));
+    const result = await updateServiceHelper(id, data);
+    if (data.image && result.image) {
+      await removeFile(result.image);
     }
-    res.status(200).json({message:"Service updated successfully"});
+    res.status(200).json({ message: "Service updated successfully" });
   } catch (error) {
-    res.status(400).json({message:error.message});
+    res.status(400).json({ message: error.message });
   }
-} 
+};

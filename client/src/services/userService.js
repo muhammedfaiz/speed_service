@@ -85,11 +85,31 @@ const logout = async()=>{
     }
 }
 
+
+const fetchServices = async()=>{
+  try{
+    const response = await axiosInstance.get('/services');
+    return response.data;
+  }catch(error){
+    throw error.response.data;
+  }
+}
+
+const getServiceDetails = async(id)=>{
+  try{
+    const response = await axiosInstance.get(`/service/${id}`);
+    return response.data;
+  }catch(error){
+    throw error.response.data;
+  }
+}
 const userService = {
   register,
   login,
   verifyOtp,
   resendOtp,
-  logout
+  logout,
+  fetchServices,
+  getServiceDetails,
 };
 export default userService;

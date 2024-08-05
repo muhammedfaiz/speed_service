@@ -184,12 +184,12 @@ const ApplicationList = () => {
                           </td>
                           <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                             <a
-                              href={`http://localhost:5000/uploads/${item.proof}`}
+                              href={item.proofUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
                               <img
-                                src={`http://localhost:5000/uploads/${item.proof}`}
+                                src={item.proofUrl}
                                 alt="proof"
                                 className="w-10 h-10"
                               />

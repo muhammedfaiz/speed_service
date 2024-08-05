@@ -32,8 +32,9 @@ export const fetchEmployee = async(email)=>{
 
 export const getServiceHelper=async(id)=>{
     try {
-        const services = await Service.find({employees:{$nin:id}});
-        const acceptedServices = await Service.find({employees:{$in:id}});
+        const employee = await Employee.findById(id);
+        const services = await Service.find({category:employee.designation,employees:{$nin:id}});
+        const acceptedServices = await Service.find({category:employee.designation,employees:{$in:id}});
         return {services,acceptedServices};
     } catch (error) {
         throw new Error("Failed to fetch services");

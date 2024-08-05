@@ -13,8 +13,8 @@ const Navbar = () => {
     dispatch(logout());
   }
   return (
-    <div>
-      <nav className="bg-gradient-to-r from-blue-600 to-indigo-950 shadow">
+    <div className="sticky top-0 z-50">
+      <nav className="bg-black shadow">
         <div className="px-8 mx-auto max-w-7xl">
           <div className="flex items-center justify-between h-16">
             <div className=" flex items-center">

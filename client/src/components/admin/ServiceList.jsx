@@ -106,14 +106,15 @@ const ServiceList = ({setEditToggle,setEditId}) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredServices?.map((service) => (
+                {
+                filteredServices?.map((service) => (
                   <tr key={service._id}>
                     <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
                           <img
                             alt="profile"
-                            src={`http://localhost:5000/uploads/${service.image}`}
+                            src={service.imageUrl}
                             className="mx-auto object-cover rounded-full h-10 w-10 "
                           />
                         </div>

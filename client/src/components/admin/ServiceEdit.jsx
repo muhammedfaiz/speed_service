@@ -16,8 +16,7 @@ const ServiceEdit = ({ id }) => {
         const response = await getCategoriesService();
         setService(result.service);
         setCategories(response.categories);
-        console.log(result.service);
-      } catch (error) {
+       } catch (error) {
         console.log(error);
       }
     }
@@ -175,7 +174,7 @@ const ServiceEdit = ({ id }) => {
             ) : (
               <div className="mt-4">
                 <img
-                  src={`http://localhost:5000/uploads/${service.image}`}
+                  src={service.imageUrl}
                   alt="Preview"
                   className="w-full h-auto"
                 />

@@ -10,6 +10,7 @@ const CategoryList = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState("");
+  const [fetchTrigger, setFetchTrigger] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -49,6 +50,7 @@ const CategoryList = () => {
         if (result.isConfirmed) {
           await deleteCategoryService(id);
           setFilteredData(filteredData.filter(category => category._id !== id));
+          setFetchTrigger(!fetchTrigger);
           toast.success("category deleted");
         }
       });
@@ -114,7 +116,7 @@ const CategoryList = () => {
                                 <a href="#" className="relative block">
                                   <img
                                     alt="profil"
-                                    src={`http://localhost:5000/uploads/${category.image}`}
+                                    src={category.imageUrl}
                                     className="mx-auto object-cover rounded-full h-10 w-10 "
                                   />
                                 </a>

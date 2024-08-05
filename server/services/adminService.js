@@ -60,7 +60,7 @@ export const userChangeStatus = async (userId, status) => {
   }
 };
 
-export const addCategoryService = async (data, file) => {
+export const addCategoryService = async (data, fileName) => {
   try {
     const existingCategory = await Category.findOne({ name: data.name });
     if (existingCategory) {
@@ -68,7 +68,7 @@ export const addCategoryService = async (data, file) => {
     } else {
       const category = new Category({
         name: data.name,
-        image: file.filename,
+        image: fileName,
       });
       await category.save();
       return category;
@@ -80,7 +80,7 @@ export const addCategoryService = async (data, file) => {
 
 export const getAllCategoriesService = async () => {
   try {
-    return await Category.find();
+    return await Category.aggregate([{$match:{}}]);
   } catch (error) {
     throw new Error(error);
   }
@@ -220,15 +220,9 @@ export const serviceData = async(id)=>{
 
 export const updateServiceHelper = async(id,data)=>{
   try {
-    let service = await Service.findById(id);
-    service.name = data.name;
-    service.description = data.description;
-    service.price = data.price;
-    service.category = data.category;
-    if(data.image){
-      service.image = data.image;
-    }
-    await service.save();
+    let service = await Service.findByIdAndUpdate(id,{
+      $set: data,
+    });
     return service;
   } catch (error) {
     console.log(error);

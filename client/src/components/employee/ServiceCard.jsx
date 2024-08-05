@@ -30,7 +30,7 @@ const ServiceCard = ({ service,setIsChanged,isChanged,serviceList }) => {
     <div className="flex max-w-full overflow-hidden bg-white rounded-lg shadow-lg my-8 justify-evenly items-center">
       <img
         className="w-1/6 rounded-md bg-cover m-3"
-        src={`http://localhost:5000/uploads/${service.image}`}
+        src={service.imageUrl}
       />
 
       <div className="w-2/3 p-4 md:p-4 ">
