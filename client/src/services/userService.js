@@ -4,7 +4,7 @@ const Api_Url = "http://localhost:5000/api/user";
 
 const axiosInstance = axios.create({
   baseURL: Api_Url,
-  withCredentials:true,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -21,25 +21,31 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-    (response)=>response,
-    async(error)=>{
-        const originalRequest = error.config;
-        if(error.response.status === 401 && !originalRequest._retry){
-            originalRequest._retry = true;
-            try{
-                const response = await axios.post(Api_Url+"/refreshToken",{},{withCredentials:true});
-                const {accessToken}=response.data;
-                localStorage.setItem("access_token",accessToken);
-                axiosInstance.defaults.headers.common['Authorization']=`Bearer ${accessToken}`;
-                return axiosInstance(originalRequest);
-            }catch(error){
-                console.log(error);
-                window.location.href='/login';
-            }
-        }
-        return Promise.reject(error);
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const response = await axios.post(
+          Api_Url + "/refreshToken",
+          {},
+          { withCredentials: true }
+        );
+        const { accessToken } = response.data;
+        localStorage.setItem("access_token", accessToken);
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${accessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (error) {
+        console.log(error);
+        window.location.href = "/login";
+      }
     }
-)
+    return Promise.reject(error);
+  }
+);
 const register = async (user) => {
   try {
     const response = await axiosInstance.post("/signup", user);
@@ -76,33 +82,101 @@ const resendOtp = async (user) => {
   }
 };
 
-const logout = async()=>{
-    try {
-       const response = await axiosInstance.post('/logout',{});
-       return response.data; 
-    } catch (error) {
-        throw error.response.data;
-    }
-}
-
-
-const fetchServices = async()=>{
-  try{
-    const response = await axiosInstance.get('/services');
+const logout = async () => {
+  try {
+    const response = await axiosInstance.post("/logout", {});
     return response.data;
-  }catch(error){
+  } catch (error) {
     throw error.response.data;
   }
-}
+};
 
-const getServiceDetails = async(id)=>{
-  try{
+const fetchServices = async () => {
+  try {
+    const response = await axiosInstance.get("/services");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+const getServiceDetails = async (id) => {
+  try {
     const response = await axiosInstance.get(`/service/${id}`);
     return response.data;
-  }catch(error){
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+const addAddressPost = async (address) => {
+  try {
+    const response = await axiosInstance.post("/address", {
+      address,
+      token: localStorage.getItem("access_token"),
+    });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+const getAddresses = async()=>{
+  try {
+    const response = await axiosInstance.get(`/addresses/${localStorage.getItem("access_token")}`);
+    return response.data;
+  } catch (error) {
     throw error.response.data;
   }
 }
+
+const addToCart = async (id)=>{
+  try {
+    const response = await axiosInstance.post(`/cart`,{id:id,token:localStorage.getItem("access_token")});
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+const getCartDetails = async()=>{
+  try {
+    const response = await axiosInstance.get(`/cart/${localStorage.getItem("access_token")}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+const updateItemQuantity = async(itemId,quantity)=>{
+  try {
+    const response = await axiosInstance.patch("/cart",{itemId,quantity});
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+const placeOrder = async(data)=>{
+  try {
+    const response = await axiosInstance.post("/order", data);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+const getClientId = async()=>{
+  try {
+    const response = await axiosInstance.get("/client-id");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+
+
 const userService = {
   register,
   login,
@@ -111,5 +185,12 @@ const userService = {
   logout,
   fetchServices,
   getServiceDetails,
+  addAddressPost,
+  getAddresses,
+  addToCart,
+  getCartDetails,
+  updateItemQuantity,
+  placeOrder,
+  getClientId,
 };
 export default userService;

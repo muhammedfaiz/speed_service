@@ -21,6 +21,7 @@ import EmployeeList from "./pages/admin/EmployeeList";
 import ServicePage from "./pages/admin/ServicePage";
 import EmployeeServices from "./pages/employee/EmployeeServices";
 import ServiceBookingPage from "./pages/user/ServiceBookingPage";
+import Checkout from "./pages/user/Checkout";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<HomePage/>}/>
       <Route path="/service/:id" element={<ServiceBookingPage/>}/>
+      <Route path="/checkout" element={<Checkout/>}/>
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLoginPage />} />

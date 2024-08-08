@@ -1,6 +1,9 @@
 import Service from "../models/Service.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import Address from "../models/Address.js";
+import Cart from "../models/Cart.js";
+import Order from "../models/Order.js";
 
 export const createUser = async ({ name, email, password, phone ,otp}) => {
   try {
@@ -68,4 +71,80 @@ export const serviceDataHelper = async(id)=>{
   }
 }
 
+export const addAddressService = async(id,data)=>{
+  try {
+    const address = new Address({
+      house:data.house,
+      city:data.city,
+      state: data.state,
+      country: data.country,
+      pincode: data.pincode,
+      user:id
+    });
+    await address.save();
+    return address;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to add address");
+  }
+}
+
+export const getAllUserAddress = async(id)=>{
+  try {
+    const data = await Address.find({user:id});
+    return data;
+  } catch (error) {
+    throw new Error("Failed to fetch address")
+  }
+}
+
+export const getServiceHelper = async (id)=>{
+  try {
+    const data = await Service.findById(id);
+    return data;
+  } catch (error) {
+    throw new Error("Failed to get service");
+  }
+}
+
+
+export const getCartDetailsUser = async(id)=>{
+  try {
+    const data = await Cart.findOne({user:id}).populate('items.item');
+    return data;
+  } catch (error) {
+    throw new Error("Failed to get Cart");
+  }
+}
+
+export const addToCartHelper = async (data)=>{
+  try {
+    const cart = Cart({...data});
+    await cart.save();
+    return;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to add to Cart");
+  }
+}
+
+export const placeOrderHelper = async(data)=>{
+  try {
+    const order = new Order(data);
+    await order.save();
+    return order;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to place order");
+  }
+}
+
+export const clearCart = async(id)=>{
+  try {
+    await Cart.findByIdAndDelete(id);
+    return;
+  } catch (error) {
+    throw new Error("Failed to clear cart");
+  }
+}
 

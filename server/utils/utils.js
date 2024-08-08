@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken'; 
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import paypal from '@paypal/checkout-server-sdk';
 export const generateOtp = ()=>{
     return Math.floor(100000+Math.random()*900000).toString();
 }
@@ -140,4 +141,33 @@ export const removeFile = async(image)=>{
     } catch (error) {
         throw new Error("Error while removing file: "+error.message);
     }
+}
+
+const environment = new paypal.core.SandboxEnvironment(
+    process.env.PAYPAL_CLIENT_ID,
+    process.env.PAYPAL_CLIENT_SECRET
+);
+export const paypalClient = new paypal.core.PayPalHttpClient(environment);
+
+export const getPaypalRequest = (amount)=>{
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer('return=representation');
+    request.requestBody({
+        intent: 'CAPTURE',
+        purchase_units: [
+            {
+                amount: {
+                    currency_code: 'USD',
+                    value: amount
+                }
+            }
+        ]
+    });
+    return request;
+}
+
+export const getPaypalCaptureRequest = (orderId)=>{
+    const request = new paypal.orders.OrdersCaptureRequest(orderId);
+    request.requestBody({});
+    return request;
 }
