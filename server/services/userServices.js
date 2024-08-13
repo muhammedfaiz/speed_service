@@ -4,12 +4,19 @@ import bcrypt from "bcryptjs";
 import Address from "../models/Address.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
+import Review from '../models/Review.js';
 
-export const createUser = async ({ name, email, password, phone ,otp}) => {
+export const createUser = async ({ name, email, password, phone, otp }) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = new User({ name, email, password: hashedPassword, phone ,otp});
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      otp,
+    });
     await user.save();
     return user;
   } catch (error) {
@@ -18,68 +25,68 @@ export const createUser = async ({ name, email, password, phone ,otp}) => {
   }
 };
 
-export const getUserByEmail = async(email)=>{
-    try{
-        const user = await User.findOne({email});
-        return user;
-    }catch(error){
-        throw new Error("Failed to find user by email");
-    }
-}
+export const getUserByEmail = async (email) => {
+  try {
+    const user = await User.findOne({ email });
+    return user;
+  } catch (error) {
+    throw new Error("Failed to find user by email");
+  }
+};
 
-export const getUserById = async (id)=>{
-  try{
+export const getUserById = async (id) => {
+  try {
     const user = await User.findById(id);
     return user;
-  }catch(error){
+  } catch (error) {
     throw new Error("Failed to find user by id");
   }
-}
+};
 
-export const expireOtp=async(userId)=>{
-  try{
-    await User.findByIdAndUpdate(userId, {otp: null});
+export const expireOtp = async (userId) => {
+  try {
+    await User.findByIdAndUpdate(userId, { otp: null });
     return true;
-  }catch(error){
+  } catch (error) {
     throw new Error("Failed to expire OTP");
   }
-}
+};
 
-export const getUserServicesData = async()=>{
+export const getUserServicesData = async () => {
   try {
-    const services = await Service.find({employees:{$ne:[]}}).populate({
-      path: 'category',
-      select: 'name -_id',
+    const services = await Service.find({ employees: { $ne: [] } }).populate({
+      path: "category",
+      select: "name -_id",
     });
     return services;
   } catch (error) {
     console.log(error);
     throw new Error("Failed to get Services");
   }
-}
+};
 
-export const serviceDataHelper = async(id)=>{
+export const serviceDataHelper = async (id) => {
   try {
     const service = await Service.findById(id).populate({
-      path: 'category',
-      select: 'name -_id',
+      path: "category",
+      select: "name",
     });
     return service;
   } catch (error) {
     console.log(error);
     throw new Error("Failed to get Service data");
   }
-}
+};
 
-export const addAddressService = async(id,data)=>{
+export const addAddressService = async (id, data) => {
   try {
     const address = new Address({
-      house:data.house,
-      city:data.city,
+      house: data.house,
+      city: data.city,
       state: data.state,
       country: data.country,
       pincode: data.pincode,
-      user:id
+      user: id,
     });
     await address.save();
     return address;
@@ -87,48 +94,60 @@ export const addAddressService = async(id,data)=>{
     console.log(error);
     throw new Error("Failed to add address");
   }
-}
+};
 
-export const getAllUserAddress = async(id)=>{
+export const getAllUserAddress = async (id) => {
   try {
-    const data = await Address.find({user:id});
+    const data = await Address.find({ user: id });
     return data;
   } catch (error) {
-    throw new Error("Failed to fetch address")
+    throw new Error("Failed to fetch address");
   }
-}
+};
 
-export const getServiceHelper = async (id)=>{
+export const getServiceHelper = async (id) => {
   try {
     const data = await Service.findById(id);
     return data;
   } catch (error) {
     throw new Error("Failed to get service");
   }
-}
+};
 
-
-export const getCartDetailsUser = async(id)=>{
+export const fetchAllCartsHelper = async (id) => {
   try {
-    const data = await Cart.findOne({user:id}).populate('items.item');
+    const data = await Cart.find({ user: id }).populate("category");
     return data;
   } catch (error) {
+    throw new Error("Failed to get cart details");
+  }
+};
+
+export const getCartDetailsUser = async (id, categoryId) => {
+  try {
+    const data = await Cart.findOne({
+      user: id,
+      category: categoryId,
+    }).populate("items.item");
+    return data;
+  } catch (error) {
+    console.log(error);
     throw new Error("Failed to get Cart");
   }
-}
+};
 
-export const addToCartHelper = async (data)=>{
+export const addToCartHelper = async (data) => {
   try {
-    const cart = Cart({...data});
+    const cart = Cart({ ...data });
     await cart.save();
     return;
   } catch (error) {
     console.log(error);
     throw new Error("Failed to add to Cart");
   }
-}
+};
 
-export const placeOrderHelper = async(data)=>{
+export const placeOrderHelper = async (data) => {
   try {
     const order = new Order(data);
     await order.save();
@@ -137,14 +156,92 @@ export const placeOrderHelper = async(data)=>{
     console.log(error);
     throw new Error("Failed to place order");
   }
-}
+};
 
-export const clearCart = async(id)=>{
+export const clearCart = async (id) => {
   try {
     await Cart.findByIdAndDelete(id);
     return;
   } catch (error) {
     throw new Error("Failed to clear cart");
   }
+};
+
+export const getBookingsHelper = async (id) => {
+  try {
+    let result = await Order.find({ user: id }).populate("orderItems.item");
+    return result;
+  } catch (error) {
+    throw new Error("Failed to get booking");
+  }
+};
+
+export const getBookingDetailsHelper = async (id) => {
+  try {
+    let result = await Order.findById(id)
+      .populate("orderItems.item")
+      .populate("address")
+      .populate({
+        path: "employee",
+        select: "name experience -_id",
+      })
+      .populate({
+        path: "category",
+        select: "name -_id",
+      });
+    return result;
+  } catch (error) {
+    throw new Error("Failed to get booking details");
+  }
+};
+
+export const getCartHelper = async (id) => {
+  try {
+    let result = await Cart.findById(id).populate("items.item");
+    return result;
+  } catch (error) {
+    throw new Error("Failed to get cart details");
+  }
+};
+
+export const cancelBookingHelper = async (id) => {
+  try {
+    let result = await Order.findByIdAndUpdate(id, { status: "Cancelled" });
+    return result;
+  } catch (error) {
+    throw new Error("Failed to cancel booking");
+  }
+};
+
+export const addReviewHelper = async (serviceId,userId,rating,comment)=>{
+  try {
+    const review = await Review.findOne({service:serviceId,user:userId});
+    if(review){
+      await Review.findByIdAndUpdate(review._id,{$set:{rating:parseInt(rating),comment}});
+      return review;
+    }
+    const data = {
+      service: serviceId,
+      user: userId,
+      rating: parseInt(rating),
+      comment: comment,
+    };
+    const result = new Review(data);
+    await result.save();
+    return result;
+  } catch (error) {
+    throw new Error("Failed to add review");
+  }
 }
 
+export const getReviewData = async(id)=>{
+  try {
+    const result = await Review.find({service:id}).populate({
+      path: 'user',
+      select: 'name -_id'
+    });
+    return result;
+  } catch (error) {
+    throw new Error("Failed to get review data");
+  }
+}

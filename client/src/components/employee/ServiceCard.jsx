@@ -39,7 +39,7 @@ const ServiceCard = ({ service,setIsChanged,isChanged,serviceList }) => {
         <p className="mt-2 text-sm text-gray-600 ">{service.description}</p>
         <div className="flex justify-between mt-3 item-center">
           <h1 className="text-lg font-bold text-gray-700 md:text-xl">
-            &#8377; {service.price}
+            $ {service.price}
           </h1>
          {serviceList ? (<button
             className="px-2 py-1 text-base font-semibold text-white uppercase transition-colors duration-300 transform bg-blue-800 rounded  hover:bg-blue-700 focus:outline-none focus:bg-blue-700"

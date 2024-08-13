@@ -26,7 +26,7 @@ const serviceSchema = new mongoose.Schema({
     employees:{
         type:Array,
         required:true,
-    }
+    },
 }
 );
 

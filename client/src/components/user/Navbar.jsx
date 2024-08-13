@@ -37,13 +37,13 @@ const Navbar = () => {
                   </Link>
                   <Link
                     className="text-gray-300  hover:text-gray-800 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    to="/checkout"
+                    to="/cart"
                   >
                     Cart
                   </Link>
                   <Link
                     className="text-gray-300  hover:text-gray-800 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    href="/bookings"
+                    to="/bookings"
                   >
                     Bookings
                   </Link>
@@ -164,21 +164,21 @@ const Navbar = () => {
               </Link>
               <Link
                 className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                href="/services"
+                to="/services"
               >
                 Services
               </Link>
               <Link
                 className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                href="/bookings"
+                to="/checkout"
               >
-                Bookings
+                Cart
               </Link>
               <Link
                 className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                href="/history"
+                to="/bookings"
               >
-                History
+                Bookings
               </Link>
             </div>
           </div>

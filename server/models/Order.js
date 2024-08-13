@@ -40,13 +40,27 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Pending", "Completed", "Cancelled"],
+      enum: ["Pending", "Completed", "Cancelled","Commited"],
       default: "Pending",
     },
     paymentMethod: {
       type: String,
       required: true,
       enum: ["cod", "paypal"],
+    },
+    captureId:{
+      type:String,
+      default:null
+    },
+    category:{
+      type: mongoose.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+    employee:{
+      type: mongoose.Types.ObjectId,
+      ref: "Employee",
+      default: null,
     },
     date: {
       type: String,

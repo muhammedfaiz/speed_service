@@ -7,8 +7,10 @@ import userService from "../../services/userService";
 import { toast } from "react-toastify";
 import { IoMdCart } from "react-icons/io";
 import { PayPalButton } from "react-paypal-button-v2";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Checkout = () => {
+  const { id } = useParams();
   const [isAddressOpen, setIsAddressOpen] = useState(false);
   const [address, setAddress] = useState({});
   const [cart, setCart] = useState(null);
@@ -20,6 +22,9 @@ const Checkout = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [addressErrors, setAddressErrors] = useState({});
+
+  const navigate = useNavigate();
 
   const slotTime = [
     "9:00 AM",
@@ -63,13 +68,25 @@ const Checkout = () => {
 
   useEffect(() => {
     const getCart = async () => {
-      const result = await userService.getCartDetails();
+      const result = await userService.getCheckout(id);
       setCart(result.cart);
     };
     getCart();
-  }, [isQuantityChange]);
+  }, [isQuantityChange, id]);
+
+  const validateAddress = () => {
+    let errors = {};
+    if (!address.house) errors.house = "House/Building is required";
+    if (!address.city) errors.city = "City is required";
+    if (!address.state) errors.state = "State is required";
+    if (!address.country) errors.country = "Country is required";
+    if (!address.pincode) errors.pincode = "Pincode is required";
+    setAddressErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const addressSubmit = async () => {
+    if (!validateAddress()) return;
     try {
       const result = await userService.addAddressPost(address);
       if (result.status == 200) {
@@ -82,9 +99,13 @@ const Checkout = () => {
     }
   };
 
-  const handleQuantityUpdate = async (itemId, quantity) => {
+  const handleQuantityUpdate = async (itemId, quantity, categoryId) => {
     try {
-      const result = await userService.updateItemQuantity(itemId, quantity);
+      const result = await userService.updateItemQuantity(
+        itemId,
+        categoryId,
+        quantity
+      );
       if (result.status == 200) {
         toast.success(result.data.message);
         setIsQuantityChange(!isQuantityChange);
@@ -98,7 +119,7 @@ const Checkout = () => {
     const response = await userService.getClientId();
     const data = JSON.parse(JSON.stringify(response));
     const script = document.createElement("script");
-    script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}`;
     script.async = true;
     document.body.appendChild(script);
   };
@@ -124,6 +145,7 @@ const Checkout = () => {
         if (result.status == 200) {
           toast.success(result.data.message);
           setCart(null);
+          navigate("/success");
         }
       } else {
         toast.error("Please select a payment method");
@@ -143,10 +165,17 @@ const Checkout = () => {
         selectedDate,
         selectedTime,
         paymentMethod,
+        captureId: paymentResult.purchase_units[0].payments.captures[0].id,
       });
       toast.success(response.data.message);
       setCart(null);
+      navigate("/success");
     }
+  };
+
+  const errorHandler = (error) => {
+    toast.error("Payment Failed, please try again");
+    console.log("Error!", error);
   };
   return (
     <>
@@ -175,7 +204,11 @@ const Checkout = () => {
                         <button
                           className="bg-primary-blue text-white p-1 rounded-l-md w-8 h-8 flex items-center justify-center hover:bg-secondary-blue"
                           onClick={() =>
-                            handleQuantityUpdate(item.item._id, -1)
+                            handleQuantityUpdate(
+                              item.item._id,
+                              -1,
+                              item.item.category
+                            )
                           }
                         >
                           -
@@ -185,13 +218,19 @@ const Checkout = () => {
                         </p>
                         <button
                           className="bg-primary-blue text-white p-1 rounded-r-md w-8 h-8 flex items-center justify-center hover:bg-secondary-blue"
-                          onClick={() => handleQuantityUpdate(item.item._id, 1)}
+                          onClick={() =>
+                            handleQuantityUpdate(
+                              item.item._id,
+                              1,
+                              item.item.category
+                            )
+                          }
                         >
                           +
                         </button>
                       </div>
                       <p className="text-base font-normal">
-                        ₹ {item.item.price}
+                        $ {item.item.price}
                       </p>
                     </div>
                   ))}
@@ -200,7 +239,7 @@ const Checkout = () => {
                   <div className="flex justify-between items-center">
                     <p className="text-lg font-semibold">Total</p>
                     <p className="text-lg font-semibold">
-                      ₹ {cart.totalAmount}
+                      $ {cart.totalAmount}
                     </p>
                   </div>
                 </div>
@@ -211,7 +250,7 @@ const Checkout = () => {
                 <div className="border-b mb-4"></div>
                 <div className="flex justify-between items-center mb-2">
                   <p>Item Total</p>
-                  <p>₹ {cart.totalAmount}.00</p>
+                  <p>$ {cart.totalAmount}.00</p>
                 </div>
                 {/* <div className="flex justify-between items-center mb-2">
                   <p>Tax (5%)</p>
@@ -219,13 +258,13 @@ const Checkout = () => {
                 </div> */}
                 <div className="flex justify-between items-center mb-2">
                   <p>Discount</p>
-                  <p>- ₹ {cart?.discount}.00</p>
+                  <p>- $ {cart?.discount}.00</p>
                 </div>
                 <div className="border-t pt-2">
                   <div className="flex justify-between items-center">
                     <p className="text-lg font-semibold">Total</p>
                     <p className="text-lg font-semibold">
-                      ₹ {cart.totalAmount}.00
+                      $ {cart.totalAmount}.00
                     </p>
                   </div>
                 </div>
@@ -244,12 +283,12 @@ const Checkout = () => {
                     + Add New Address
                   </p>
                 </div>
-                <div className="w-full flex">
+                <div className="w-full flex flex-wrap justify-evenly">
                   {getAddresses &&
-                    getAddresses?.map((address) => (
+                    getAddresses.map((address) => (
                       <div
                         key={address._id}
-                        className="p-3 mr-1 w-1/2 flex items-start space-x-3 border border-gray-200 rounded-lg"
+                        className="p-3 mb-4 w-full sm:w-1/2 md:w-1/3 flex items-start space-x-3 border border-gray-200 rounded-lg"
                       >
                         <input
                           type="radio"
@@ -276,6 +315,7 @@ const Checkout = () => {
                     ))}
                 </div>
               </div>
+
               <div className="w-full border rounded-md p-4 bg-white mt-6">
                 <p className="text-lg font-semibold mb-2">Slot</p>
                 <div className="border-b "></div>
@@ -335,6 +375,7 @@ const Checkout = () => {
               <PayPalButton
                 amount={cart.totalAmount}
                 onSuccess={successHandler}
+                onError={errorHandler}
               />
             ) : (
               <button
@@ -380,6 +421,9 @@ const Checkout = () => {
                 setAddress({ ...address, house: e.target.value })
               }
             />
+            {addressErrors.house && (
+              <p className="text-red-500 text-sm">{addressErrors.house}</p>
+            )}
           </div>
           <div className="flex flex-col">
             <label
@@ -395,6 +439,9 @@ const Checkout = () => {
               className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setAddress({ ...address, city: e.target.value })}
             />
+            {addressErrors.city && (
+              <p className="text-red-500 text-sm">{addressErrors.city}</p>
+            )}
           </div>
           <div className="flex flex-col">
             <label
@@ -412,6 +459,9 @@ const Checkout = () => {
                 setAddress({ ...address, state: e.target.value })
               }
             />
+            {addressErrors.state && (
+              <p className="text-red-500 text-sm">{addressErrors.state}</p>
+            )}
           </div>
           <div className="flex flex-col">
             <label
@@ -429,6 +479,9 @@ const Checkout = () => {
                 setAddress({ ...address, country: e.target.value })
               }
             />
+            {addressErrors.country && (
+              <p className="text-red-500 text-sm">{addressErrors.country}</p>
+            )}
           </div>
           <div className="flex flex-col">
             <label
@@ -446,6 +499,9 @@ const Checkout = () => {
                 setAddress({ ...address, pincode: e.target.value })
               }
             />
+            {addressErrors.pincode && (
+              <p className="text-red-500 text-sm">{addressErrors.pincode}</p>
+            )}
           </div>
           <div className="flex justify-end">
             <button

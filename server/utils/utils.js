@@ -171,3 +171,10 @@ export const getPaypalCaptureRequest = (orderId)=>{
     request.requestBody({});
     return request;
 }
+
+export const refundPayment = async (captureId)=>{
+    let request = new paypal.payments.CapturesRefundRequest(captureId);
+    request.requestBody({});
+    const response = await paypalClient.execute(request);
+    return response;
+}

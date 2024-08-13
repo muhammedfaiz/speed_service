@@ -22,6 +22,11 @@ import ServicePage from "./pages/admin/ServicePage";
 import EmployeeServices from "./pages/employee/EmployeeServices";
 import ServiceBookingPage from "./pages/user/ServiceBookingPage";
 import Checkout from "./pages/user/Checkout";
+import SuccessOrderPage from "./pages/user/SuccessOrderPage";
+import BookingsPage from "./pages/user/BookingsPage";
+import BookingDetailsPage from "./pages/user/BookingDetailsPage";
+import CartPage from "./pages/user/CartPage";
+import EmployeeRequestPage from "./pages/employee/EmployeeRequestPage";
 
 function App() {
   return (
@@ -33,7 +38,11 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<HomePage/>}/>
       <Route path="/service/:id" element={<ServiceBookingPage/>}/>
-      <Route path="/checkout" element={<Checkout/>}/>
+      <Route path="/cart" element={<CartPage/>}/>
+      <Route path="/checkout/:id" element={<Checkout/>}/>
+      <Route path="/success" element={<SuccessOrderPage/>}/>
+      <Route path="/bookings" element={<BookingsPage/>}/>
+      <Route path="/booking-details/:id" element={<BookingDetailsPage/>}/>
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -55,6 +64,7 @@ function App() {
       <Route element={<EmployeeAuth/>}>
       <Route path="/employee/dashboard" element={<EmployeeDashboard/>}/>
       <Route path="/employee/services" element={<EmployeeServices/>}/>
+      <Route path="/employee/requests" element={<EmployeeRequestPage/>}/>
       </Route>
       
     </Routes>

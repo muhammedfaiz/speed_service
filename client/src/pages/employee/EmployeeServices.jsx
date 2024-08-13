@@ -6,9 +6,10 @@ import { fetchServices } from "../../services/employeeService";
 
 const EmployeeServices = () => {
   const [services, setServices] = useState([]);
-  const [acceptedServices,setAcceptedServices]=useState([]);
+  const [acceptedServices, setAcceptedServices] = useState([]);
   const [serviceList, setServiceList] = useState(true);
   const [isChanged, setIsChanged] = useState(false);
+
   useEffect(() => {
     async function getServices() {
       try {
@@ -21,6 +22,7 @@ const EmployeeServices = () => {
     }
     getServices();
   }, [isChanged]);
+
   return (
     <>
       <Navbar />
@@ -32,18 +34,18 @@ const EmployeeServices = () => {
           </div>
           <ul className="mt-5 space-y-3 cursor-pointer text-center">
             <li
-              className="text-base font-semibold hover:text-gray-500"
-              onClick={() => {
-                setServiceList(true);
-              }}
+              className={`text-base font-semibold hover:text-gray-500 ${
+                serviceList ? "text-gray-800" : "text-gray-600"
+              }`}
+              onClick={() => setServiceList(true)}
             >
               Service List
             </li>
             <li
-              className="text-base font-semibold hover:text-gray-500"
-              onClick={() => {
-                setServiceList(false);
-              }}
+              className={`text-base font-semibold hover:text-gray-500 ${
+                !serviceList ? "text-gray-800" : "text-gray-600"
+              }`}
+              onClick={() => setServiceList(false)}
             >
               Accepted Services
             </li>
@@ -53,11 +55,9 @@ const EmployeeServices = () => {
           {serviceList ? (
             <div>
               <h1 className="text-2xl font-bold mb-1">Service List</h1>
-              <p className="text-sm mb-4 text-gray-500 ">
-                Services you can provide.
-              </p>
-              {services.length > 0 &&
-                services?.map((service, index) => (
+              <p className="text-sm mb-4 text-gray-500">Services you can provide.</p>
+              {services.length > 0 ? (
+                services.map((service, index) => (
                   <ServiceCard
                     key={index}
                     service={service}
@@ -65,16 +65,19 @@ const EmployeeServices = () => {
                     isChanged={isChanged}
                     serviceList={serviceList}
                   />
-                ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-500 mt-10">
+                  No services available at the moment.
+                </div>
+              )}
             </div>
           ) : (
             <div>
               <h1 className="text-2xl font-bold mb-1">Accepted Services</h1>
-              <p className="text-sm mb-4 text-gray-500 ">
-                Services you are providing.
-              </p>
-              {acceptedServices.length > 0 &&
-                acceptedServices?.map((service, index) => (
+              <p className="text-sm mb-4 text-gray-500">Services you are providing.</p>
+              {acceptedServices.length > 0 ? (
+                acceptedServices.map((service, index) => (
                   <ServiceCard
                     key={index}
                     service={service}
@@ -82,7 +85,12 @@ const EmployeeServices = () => {
                     isChanged={isChanged}
                     serviceList={serviceList}
                   />
-                ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-500 mt-10">
+                  No accepted services at the moment.
+                </div>
+              )}
             </div>
           )}
         </main>

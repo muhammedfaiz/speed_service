@@ -1,11 +1,18 @@
 import {
-    addAddressService,
+  addAddressService,
+  addReviewHelper,
   addToCartHelper,
+  cancelBookingHelper,
   clearCart,
   createUser,
   expireOtp,
+  fetchAllCartsHelper,
   getAllUserAddress,
+  getBookingDetailsHelper,
+  getBookingsHelper,
   getCartDetailsUser,
+  getCartHelper,
+  getReviewData,
   getServiceHelper,
   getUserByEmail,
   getUserById,
@@ -22,6 +29,7 @@ import {
   getPaypalCaptureRequest,
   getPaypalRequest,
   paypalClient,
+  refundPayment,
   sendOtp,
   verifyToken,
 } from "../utils/utils.js";
@@ -43,16 +51,14 @@ const userRegister = async (req, res) => {
     setTimeout(async () => {
       await expireOtp(user._id);
     }, 60000);
-    res
-      .status(200)
-      .json({
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          otpSent: true,
-        },
-      });
+    res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        otpSent: true,
+      },
+    });
   } catch (error) {
     res.status(409).json({ message: error.message });
   }
@@ -79,12 +85,10 @@ const userLogin = async (req, res) => {
         sameSite: "None",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      res
-        .status(200)
-        .json({
-          user: { name: user.name, email: user.email },
-          token: accessToken,
-        });
+      res.status(200).json({
+        user: { name: user.name, email: user.email },
+        token: accessToken,
+      });
     }
   } catch (error) {
     res.status(401).json({ message: error.message });
@@ -109,16 +113,14 @@ const verifyOtp = async (req, res) => {
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    res
-      .status(200)
-      .json({
-        user: {
-          name: user.name,
-          email: user.email,
-          isVerified: user.isVerified,
-        },
-        token: accessToken,
-      });
+    res.status(200).json({
+      user: {
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+      token: accessToken,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -138,15 +140,13 @@ const resendOtp = async (req, res) => {
     setTimeout(async () => {
       await expireOtp(user._id);
     }, 60000);
-    res
-      .status(200)
-      .json({
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        otpSent: true,
-      });
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      otpSent: true,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -209,153 +209,243 @@ const serviceData = async (req, res) => {
   try {
     const { id } = req.params;
     const data = await serviceDataHelper(id);
+    const reviews = await getReviewData(id);
     const service = { ...data._doc };
     const url = await getFile(data.image);
     service.imageUrl = url;
-    res.status(200).json({ service });
+    res.status(200).json({ service,reviews });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
 
 const addAddress = async (req, res) => {
-    try {
-        const {address,token}=req.body;
-        const decode = verifyToken(token);
-        if(!address){
-            throw new Error("Address field is required");
-        }
-        const result = await addAddressService(decode.id,address);
-        if(result){
-            res.status(200).json({ message: "Address added successfully" });
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({ message: error.message });
-    }
-};
-
-const getUserAddresses = async(req,res)=>{
-    try {
-        const {token}=req.params;
-        const decode = verifyToken(token);
-        const addresses = await getAllUserAddress(decode.id);
-        if(!addresses){
-            throw new Error("User addresses not found");
-        }
-        res.status(200).json({addresses});
-    } catch (error) {
-        res.status(404).json({message:error.message});
-    }
-}
-
-const addItemToCart = async(req,res)=>{
   try {
-    const {id,token} = req.body;
+    const { address, token } = req.body;
     const decode = verifyToken(token);
-    const service = await getServiceHelper(id);
-    const cart = await getCartDetailsUser(decode.id);
-    let data = {};
-    if(cart){
-      let itemExist = cart.items.find(item=>item.item._id==id);
-      if(itemExist){
-        itemExist.quantity++;
-        cart.totalAmount +=service.price; 
-      }else{
-        cart.items.push({item:id,quantity:1})
-        cart.totalAmount += service.price;
-      }
-      await cart.save();
-    }else{
-      data.user=decode.id;
-      data.items = [{item:id,quantity:1}];
-      data.totalAmount = service.price;
-      await addToCartHelper(data);
+    if (!address) {
+      throw new Error("Address field is required");
     }
-    res.status(200).json({message:"Item added to cart successfully"})
+    const result = await addAddressService(decode.id, address);
+    if (result) {
+      res.status(200).json({ message: "Address added successfully" });
+    }
   } catch (error) {
     console.log(error);
-    res.status(500).json({message:"Failed to add item to cart"})
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const getUserAddresses = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const decode = verifyToken(token);
+    const addresses = await getAllUserAddress(decode.id);
+    if (!addresses) {
+      throw new Error("User addresses not found");
+    }
+    res.status(200).json({ addresses });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+const addItemToCart = async (req, res) => {
+  try {
+    const { id, token } = req.body;
+    const decode = verifyToken(token);
+    const service = await getServiceHelper(id);
+    const cart = await getCartDetailsUser(decode.id,service.category);
+    let data = {};
+    if (cart) {
+        let itemExist = cart.items.find((item) => item.item._id == id);
+        if (itemExist) {
+          itemExist.quantity++;
+          cart.totalAmount += service.price;
+        } else {
+          cart.items.push({ item: id, quantity: 1 });
+          cart.totalAmount += service.price;
+        }
+        await cart.save(); 
+    }else {
+      data.user = decode.id;
+      data.items = [{ item: id, quantity: 1 }];
+      data.totalAmount = service.price;
+      data.category = service.category;
+      await addToCartHelper(data);
+    }
+    res.status(200).json({ message: "Item added to cart successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to add item to cart" });
+  }
+};
+
+const fetchAllCarts = async(req,res)=>{
+  try {
+    const data = await fetchAllCartsHelper(req.user.id);
+    const carts = JSON.parse(JSON.stringify(data));
+    for(let cart of carts){
+      const url = await getFile(cart.category.image);
+      cart.imageUrl=url;
+    }
+    res.status(200).json({ carts })
+  } catch (error) {
+    res.status(500).json({message:"Failed to fetch the carts"})
   }
 }
 
-const getUserCart = async(req,res)=>{
+const getUserCartForService = async (req, res) => {
   try {
-    const {token} = req.params;
+    const { token,id } = req.params;
     const decode = verifyToken(token);
-    const data = await getCartDetailsUser(decode.id);
-    let cart=JSON.parse(JSON.stringify(data?._doc));
-    for(let item of cart.items ){
+    const data = await getCartDetailsUser(decode.id,id);
+    let cart = JSON.parse(JSON.stringify(data?._doc));
+    for (let item of cart.items) {
       const url = await getFile(item.item.image);
       item.imageUrl = url;
     }
-    if(!cart){
+    if (!cart) {
       throw new Error("User cart not found");
     }
-    res.status(200).json({cart});
+    res.status(200).json({ cart });
   } catch (error) {
     console.log(error);
-    res.status(400).json({message:"Failed to access user cart"});
+    res.status(400).json({ message: "Failed to access user cart" });
   }
-}
+};
 
-const updateQuantityCart = async(req,res)=>{
+const updateQuantityCart = async (req, res) => {
   try {
-    const {itemId,quantity}=req.body;
-    const cart = await getCartDetailsUser(req.user.id);
-    if(cart){
-      const item = cart.items.find(item=>item.item._id==itemId);
-      if(item){
-        item.quantity+=quantity;
-        cart.totalAmount+=quantity*item.item.price;
+    const { itemId,quantity, categoryId } = req.body;
+    const cart = await getCartDetailsUser(req.user.id,categoryId);
+    if (cart) {
+      const item = cart.items.find((item) => item.item._id == itemId);
+      if (item) {
+        item.quantity += quantity;
+        cart.totalAmount += quantity * item.item.price;
       }
-      if(item.quantity==0){
-        cart.items = cart.items.filter(item=>item.item._id!=itemId);
+      if (item.quantity == 0) {
+        cart.items = cart.items.filter((item) => item.item._id != itemId);
       }
       await cart.save();
     }
-    res.status(200).json({message:"Quantity updated successfully"});
+    res.status(200).json({ message: "Quantity updated successfully" });
   } catch (error) {
-    res.status(500).json({message:"Failed to update quantity"});
+    res.status(500).json({ message: "Failed to update quantity" });
   }
-}
+};
 
-const placeOrder = async(req,res)=>{
+const placeOrder = async (req, res) => {
   try {
     const data = req.body;
-    const cart = await getCartDetailsUser(data.cart.user);
-    if(cart){
-      data.cart = cart._doc;
+    if (data.cart) {
       const details = {
-        user:data.cart.user,
-        totalAmount:data.cart.totalAmount,
-        address:data.selectedAddress,
-        paymentMethod:data.paymentMethod,
-        date:data.selectedDate,
-        time:data.selectedTime,
-        orderItems:[],
-      }
-      for(let item of cart.items){
+        user: data.cart.user,
+        totalAmount: data.cart.totalAmount,
+        address: data.selectedAddress,
+        paymentMethod: data.paymentMethod,
+        date: data.selectedDate,
+        time: data.selectedTime,
+        orderItems: [],
+        captureId: data.captureId,
+        category:data.cart.category
+      };
+      for (let item of data.cart.items) {
         details.orderItems.push({
-          item:item.item._id,
-          quantity:item.quantity,
-          price:item.item.price,
-          totalPrice:item.quantity*item.item.price,
-        }) 
+          item: item.item._id,
+          quantity: item.quantity,
+          price: item.item.price,
+          totalPrice: item.quantity * item.item.price,
+        });
       }
       const order = await placeOrderHelper(details);
-      if(order){
-        await clearCart(cart._id);
-        res.status(200).json({message:"Order placed successfully"});
+      if (order) {
+        await clearCart(data.cart._id);
+        res.status(200).json({ message: "Order placed successfully" });
       }
     }
   } catch (error) {
     console.log(error);
-    res.status(404).json({message:"Error placing order"});
+    res.status(404).json({ message: "Error placing order" });
+  }
+};
+
+const fetchBookings = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const data = await getBookingsHelper(id);
+    const orders = JSON.parse(JSON.stringify(data));
+    for (let order of orders) {
+      for (let item of order.orderItems) {
+        const url = await getFile(item.item.image);
+        item.imageUrl = url;
+      }
+    }
+    res.status(200).json({ bookings: orders });
+  } catch (error) {
+    res.status(404).json({ message: "Error getting bookings" });
+  }
+};
+
+const getBookingDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await getBookingDetailsHelper(id);
+    const booking = JSON.parse(JSON.stringify(data));
+    for (let item of booking.orderItems) {
+      const url = await getFile(item.item.image);
+      item.imageUrl = url;
+    }
+    res.status(200).json({ booking });
+  } catch (error) {
+    res.status(404).json({ message: "Error getting bookings" });
+  }
+};
+
+const getCheckoutDetails = async(req,res)=>{
+  try {
+    const { id } = req.params;
+    const data = await getCartHelper(id);
+    const cart = JSON.parse(JSON.stringify(data));
+    for (let item of cart.items) {
+      const url = await getFile(item.item.image);
+      item.imageUrl = url;
+    }
+    res.status(200).json({cart});
+  } catch (error) {
+    res.status(404).json({ message: "Error getting Cart"});
   }
 }
 
+const cancelBooking = async(req,res)=>{
+  try {
+    const {id}=req.params;
+    const result = await cancelBookingHelper(id);
+    if(result){
+      if(result.paymentMethod ==='paypal'){
+        await refundPayment(result.captureId);
+        return res.status(200).json({message:"Booking cancelled successfully and payment will be refunded shortly."});
+      }
+      return res.status(200).json({message:"Booking cancelled successfully"});
+    }
+  } catch (error) {
+    res.status(400).json({message:"Error cancelling booking"});
+  }
+}
 
+const addReview = async(req,res)=>{
+  try {
+    const {id, rating, comment} = req.body;
+    const result = await addReviewHelper(id,req.user.id,rating,comment);
+    if(result){
+      res.status(200).json({message:"Review added successfully"});
+    }
+  } catch (error) {
+    res.status(400).json({message:"Error adding review"});
+  }
+}
 
 export {
   userRegister,
@@ -369,7 +459,13 @@ export {
   addAddress,
   getUserAddresses,
   addItemToCart,
-  getUserCart,
+  fetchAllCarts,
+  getUserCartForService,
   updateQuantityCart,
   placeOrder,
+  fetchBookings,
+  getBookingDetails,
+  getCheckoutDetails,
+  cancelBooking,
+  addReview
 };

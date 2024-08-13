@@ -139,18 +139,27 @@ const addToCart = async (id)=>{
   }
 }
 
-const getCartDetails = async()=>{
+const fetchCarts = async()=>{
   try {
-    const response = await axiosInstance.get(`/cart/${localStorage.getItem("access_token")}`);
+    const response = await axiosInstance.get(`/carts`);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 }
 
-const updateItemQuantity = async(itemId,quantity)=>{
+const getCartDetails = async(id)=>{
   try {
-    const response = await axiosInstance.patch("/cart",{itemId,quantity});
+    const response = await axiosInstance.get(`/cart/${localStorage.getItem("access_token")}/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+const updateItemQuantity = async(itemId,categoryId,quantity)=>{
+  try {
+    const response = await axiosInstance.patch("/cart",{itemId,categoryId,quantity});
     return response;
   } catch (error) {
     throw error.response.data;
@@ -175,6 +184,51 @@ const getClientId = async()=>{
   }
 }
 
+const getBookings = async()=>{
+  try {
+    const response = await axiosInstance.get("/bookings");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+const fetchBookingDetails = async(id)=>{
+  try {
+    const response = await axiosInstance.get(`/booking-details/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+export const getCheckout = async(id)=>{
+  try {
+    const response = await axiosInstance.get(`/checkout/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
+ export const cancelBooking = async(id)=>{
+  try {
+    const response = await axiosInstance.patch(`cancel-booking/${id}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
+ const submitReview = async(data)=>{
+  try {
+    const response = await axiosInstance.post("/review", data);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
 
 
 const userService = {
@@ -188,9 +242,15 @@ const userService = {
   addAddressPost,
   getAddresses,
   addToCart,
+  fetchCarts,
   getCartDetails,
   updateItemQuantity,
   placeOrder,
   getClientId,
+  getBookings,
+  fetchBookingDetails,
+  getCheckout,
+  cancelBooking,
+  submitReview
 };
 export default userService;

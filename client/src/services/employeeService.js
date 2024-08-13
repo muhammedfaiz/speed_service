@@ -87,3 +87,21 @@ export const rejectService = async(id)=>{
         throw error.response.data;
     }
 }
+
+export const getRequests = async()=>{
+    try{
+        const response = await axiosInstance.get('/requests/'+localStorage.getItem("employee_access_token"));
+        return response.data;
+    }catch(error){
+        throw error.response.data;
+    }
+}
+
+export const acceptRequest = async(id)=>{
+    try {
+        const response = await axiosInstance.patch('/accept-request',{token:localStorage.getItem('employee_access_token'),id});
+        return response;
+    } catch (error) {
+        throw error.response.data;
+    }
+}

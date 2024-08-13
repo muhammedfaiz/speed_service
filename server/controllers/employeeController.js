@@ -1,9 +1,12 @@
 import {
+  acceptRequestService,
   addService,
   applicationService,
   declineService,
   fetchEmployee,
   getCategoriesService,
+  getEmployeeDetails,
+  getOrderRequests,
   getServiceHelper,
 } from "../services/employeeServices.js";
 import {
@@ -171,3 +174,30 @@ export const rejectService = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getBookings = async(req,res)=>{
+  try {
+    const {token}=req.params;
+    const decode=verifyToken(token);
+    const employee = await getEmployeeDetails(decode.id);
+    const bookings = await getOrderRequests(employee);
+    if(bookings){
+      res.status(200).json({bookings});
+    }
+  } catch (error) {
+    res.status(400).json({message:"Bookings not found"});
+  }
+}
+
+export const acceptRequest = async(req,res)=>{
+  try {
+    const {token,id}=req.body;
+    const decode=verifyToken(token);
+    const result = await acceptRequestService({employee:decode.id,orderId:id});
+    if(result){
+      res.status(200).json({message:"Request accepted successfully"});
+    }
+  } catch (error) {
+    res.status(400).json({message:error.message});
+  }
+}
