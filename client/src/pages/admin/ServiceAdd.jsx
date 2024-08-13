@@ -1,11 +1,9 @@
 import Navbar from "../../components/admin/Navbar";
 import ProfileDropdown from "../../components/admin/ProfileDropdown";
 import logo from "../../assets/logo-transparent.png";
-import CategoryList from "../../components/admin/CategoryList";
-import { useNavigate } from "react-router-dom";
+import AddService from "../../components/admin/AddService";
 
-const Category = () => {
-  const navigate = useNavigate();
+const ServiceAdd = () => {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
       <aside className="w-full lg:w-64 bg-gradient-to-b from-blue-600 to-indigo-950 text-white flex flex-col lg:h-screen">
@@ -19,20 +17,12 @@ const Category = () => {
           <ProfileDropdown />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Categories</h1>
-          <p className="text-gray-600">Manage your categories here.</p>
+          <h1 className="text-3xl font-bold">Service</h1>
+          <p className="text-gray-600">Manage your services here.</p>
         </div>
-        <div className="w-full mt-14 flex justify-end px-28">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-base"
-            onClick={() => navigate("/admin/add-category")}
-          >
-            Add Category
-          </button>
-        </div>
-        <CategoryList />
+        <AddService/>
       </main>
     </div>
   );
 };
-export default Category;
+export default ServiceAdd;

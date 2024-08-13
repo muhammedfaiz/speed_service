@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCategoriesService, getService, updateService } from "../../services/adminService";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 const ServiceEdit = ({ id }) => {
@@ -9,6 +10,7 @@ const ServiceEdit = ({ id }) => {
   const [categories, setCategories] = useState([]);
   const [preview, setPreview] = useState();
   const [data, setData] = useState({});
+  const navigate = useNavigate();
   useEffect(() => {
     async function fetchEditService() {
       try {
@@ -65,7 +67,7 @@ const ServiceEdit = ({ id }) => {
      const result = await updateService(id, formData);
      if(result.status==200){
         toast.success(result.data.message);
-        window.location.href = "/admin/services";
+        navigate("/admin/services");
      }
    } catch (error) {
     toast.error(error.message)

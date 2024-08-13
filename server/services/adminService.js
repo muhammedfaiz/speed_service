@@ -80,7 +80,7 @@ export const addCategoryService = async (data, fileName) => {
 
 export const getAllCategoriesService = async () => {
   try {
-    return await Category.aggregate([{$match:{}}]);
+    return await Category.aggregate([{$match:{}},{$sort:{'updatedAt':-1}}]);
   } catch (error) {
     throw new Error(error);
   }
@@ -109,7 +109,7 @@ export const getApplicationService = async () => {
     let applications = await Application.find().populate({
       path: "designation",
       select: "name -_id",
-    });
+    }).sort({updatedAt:-1});
     return applications;
   } catch (error) {
     console.log(error);
@@ -193,9 +193,10 @@ export const getServicesData = async()=>{
     let services = await Service.find().populate({
       path:'category',
       select:'name -_id',
-    });
+    }).sort({updatedAt:-1});
     return services;
   }catch(error){
+    console.log(error)
     throw new Error("Failed to get services");
   }
 }

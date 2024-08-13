@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addCategoryService } from "../../services/adminService";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CategoryForm = () => {
   const [form, setForm] = useState({
@@ -9,6 +10,7 @@ const CategoryForm = () => {
   });
   const [preview, setPreview] = useState(null);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -23,8 +25,6 @@ const CategoryForm = () => {
     let errors = {};
     if (!form.name) {
       errors.name = "Please enter category name";
-    } else if (!/^[A-Za-z]+(\s+)?$/.test(form.name)) {
-      errors.name = "Category name should only contain alphabets";
     }
     if (!form.image) {
       errors.image = "Please select an image";
@@ -49,6 +49,7 @@ const CategoryForm = () => {
       formData.append("image", form.image);
       await addCategoryService(formData);
       toast.success("Added Category successfully");
+      navigate("/admin/categories");
     } catch (error) {
       toast.error(error.message);
     }

@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { deleteService, getAllServices } from "../../services/adminService";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
-const ServiceList = ({setEditToggle,setEditId}) => {
+const ServiceList = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [search, setSearch] = useState("");
   const [change,setChange]=useState(false);
- 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -143,8 +144,7 @@ const ServiceList = ({setEditToggle,setEditId}) => {
                     <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                       <a
                       onClick={()=>{
-                        setEditId(service._id);
-                        setEditToggle(true);
+                        navigate(`/admin/edit-service/${service._id}`);
                       }}
                         className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                       >

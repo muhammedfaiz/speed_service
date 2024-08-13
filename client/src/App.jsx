@@ -27,6 +27,9 @@ import BookingsPage from "./pages/user/BookingsPage";
 import BookingDetailsPage from "./pages/user/BookingDetailsPage";
 import CartPage from "./pages/user/CartPage";
 import EmployeeRequestPage from "./pages/employee/EmployeeRequestPage";
+import ServiceAdd from "./pages/admin/ServiceAdd";
+import EditService from "./pages/admin/EditService";
+import AddCategoryPage from "./pages/admin/AddCategoryPage";
 
 function App() {
   return (
@@ -50,9 +53,12 @@ function App() {
       <Route path="/admin/dashboard" element={<Dashboard/>}/>
       <Route path="/admin/users" element={<UserList/>}/>
       <Route path="/admin/categories" element={<Category/>}/>
+      <Route path="/admin/add-category" element={<AddCategoryPage/>}/>
       <Route path="/admin/applicants" element={<ApplicationList/>}/>
       <Route path="/admin/employee" element={<EmployeeList/>}/>
       <Route path="/admin/services" element={<ServicePage/>}/>
+      <Route path="/admin/add-service" element={<ServiceAdd/>}/>
+      <Route path="/admin/edit-service/:id" element={<EditService/>}/>
       </Route>
 
       

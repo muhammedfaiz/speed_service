@@ -1,15 +1,11 @@
 import Navbar from "../../components/admin/Navbar";
 import ProfileDropdown from "../../components/admin/ProfileDropdown";
 import logo from "../../assets/logo-transparent.png";
-import { useState } from "react";
 import ServiceList from "../../components/admin/ServiceList";
-import AddService from "../../components/admin/AddService";
-import ServiceEdit from "../../components/admin/ServiceEdit";
+import { useNavigate } from "react-router-dom";
 
 const ServicePage = () => {
-  const [serviceAdd, setServiceAdd] = useState(false);
-  const [editId,setEditId]=useState('');
-  const [editToggle,setEditToggle]=useState(false);
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
       <aside className="w-full lg:w-64 bg-gradient-to-b from-blue-600 to-indigo-950 text-white flex flex-col lg:h-screen">
@@ -26,47 +22,16 @@ const ServicePage = () => {
           <h1 className="text-3xl font-bold">Service</h1>
           <p className="text-gray-600">Manage your services here.</p>
         </div>
-        {!serviceAdd && !editToggle && (
-          <>
+          
             <div className="w-full mt-8 flex justify-end px-28">
               <button
-                onClick={() => setServiceAdd(true)}
+                onClick={() => navigate("/admin/add-service")}
                 className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-base"
               >
                 Add Service
               </button>
             </div>
-            <ServiceList setEditToggle={setEditToggle} setEditId={setEditId}/>
-          </>
-        )}
-        {serviceAdd && (
-            <>
-            <div className="w-full mt-8 flex justify-end px-28">
-              <button
-                onClick={() => setServiceAdd(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-base"
-              >
-                Back
-              </button>
-            </div>
-            <AddService/>
-            </>
-        )}
-        {
-          editToggle && editId && (
-           <>
-            <div className="w-full mt-8 flex justify-end px-28">
-              <button
-                onClick={() => setEditToggle(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-base"
-              >
-                Back
-              </button>
-            </div>
-            <ServiceEdit id={editId}/>
-           </>
-          )
-        }
+            <ServiceList />
       </main>
     </div>
   );
