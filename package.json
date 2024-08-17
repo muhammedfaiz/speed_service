@@ -13,7 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "mapbox-gl": "^3.5.2",
+    "react-mapbox-gl": "^5.1.1",
+    "react-mapbox-gl-geocoder": "^1.1.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

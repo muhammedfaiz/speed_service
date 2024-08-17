@@ -29,11 +29,11 @@ const BookingsPage = () => {
           {bookings.length > 0 ? (
             bookings.map((booking) => (
               <div
-                key={booking._id}
+                key={booking.orderId}
                 className="p-6 mb-6 bg-gray-50 rounded-md shadow-sm border-b hover:shadow-md transition-shadow duration-200"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-gray-700">Order ID: #{booking._id}</h3>
+                  <h3 className="text-xl font-semibold text-gray-700">Order ID: {booking.orderId}</h3>
                   <span
                     className={`px-3 py-1 rounded-full text-sm ${
                       booking.status === "Completed"

@@ -18,13 +18,13 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
-        price:{
-            type: Number,
-            required: true,
+        price: {
+          type: Number,
+          required: true,
         },
-        totalPrice:{
-            type: Number,
-            required: true,
+        totalPrice: {
+          type: Number,
+          required: true,
         }
       },
     ],
@@ -40,24 +40,24 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Pending", "Completed", "Cancelled","Commited"],
+      enum: ["Pending", "Completed", "Cancelled", "Commited"],
       default: "Pending",
     },
     paymentMethod: {
       type: String,
       required: true,
-      enum: ["cod", "paypal"],
+      enum: ["cash", "paypal"],
     },
-    captureId:{
-      type:String,
-      default:null
+    captureId: {
+      type: String,
+      default: null,
     },
-    category:{
+    category: {
       type: mongoose.Types.ObjectId,
       ref: "Category",
       required: true,
     },
-    employee:{
+    employee: {
       type: mongoose.Types.ObjectId,
       ref: "Employee",
       default: null,
@@ -70,9 +70,24 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    orderId: {
+      type: String,
+      unique: true,
+    },
   },
   { timestamps: true }
 );
+
+orderSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const orderPrefix = "ORD";
+    const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, ""); 
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString(); 
+
+    this.orderId = `${orderPrefix}-${currentDate}-${randomSuffix}`;
+  }
+  next();
+});
 
 const Order = mongoose.model("Order", orderSchema);
 

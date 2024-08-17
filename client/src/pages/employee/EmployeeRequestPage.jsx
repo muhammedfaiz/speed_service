@@ -74,7 +74,7 @@ const EmployeeRequestPage = () => {
                   <div className="text-sm text-gray-600 mb-2">
                     <FaMapMarkerAlt className="inline mr-2 text-red-500" />{" "}
                     <span className="font-semibold">Address:</span>{" "}
-                    {booking?.address?.house}, {booking?.address?.city},{" "}
+                    {booking?.address?.locality}, {booking?.address?.place},{" "}
                     {booking?.address?.state}, {booking?.address?.pincode}
                   </div>
                   <div className="text-sm text-gray-600 mb-2">

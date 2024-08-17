@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { IoMdCart } from "react-icons/io";
 import { PayPalButton } from "react-paypal-button-v2";
 import { useNavigate, useParams } from "react-router-dom";
+import MapLocation from "../../components/user/MapLocation";
 
 const Checkout = () => {
   const { id } = useParams();
@@ -22,9 +23,10 @@ const Checkout = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [addressErrors, setAddressErrors] = useState({});
 
   const navigate = useNavigate();
+
+  
 
   const slotTime = [
     "9:00 AM",
@@ -74,19 +76,10 @@ const Checkout = () => {
     getCart();
   }, [isQuantityChange, id]);
 
-  const validateAddress = () => {
-    let errors = {};
-    if (!address.house) errors.house = "House/Building is required";
-    if (!address.city) errors.city = "City is required";
-    if (!address.state) errors.state = "State is required";
-    if (!address.country) errors.country = "Country is required";
-    if (!address.pincode) errors.pincode = "Pincode is required";
-    setAddressErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+  
 
   const addressSubmit = async () => {
-    if (!validateAddress()) return;
+    
     try {
       const result = await userService.addAddressPost(address);
       if (result.status == 200) {
@@ -134,7 +127,7 @@ const Checkout = () => {
       return;
     }
     try {
-      if (paymentMethod == "cod") {
+      if (paymentMethod == "cash") {
         const result = await userService.placeOrder({
           cart,
           selectedAddress,
@@ -275,6 +268,7 @@ const Checkout = () => {
               <div className="w-full border rounded-md p-4 bg-white">
                 <h2 className="text-lg font-semibold">Address</h2>
                 <div className="border-b my-3"></div>
+                
                 <div
                   onClick={() => setIsAddressOpen(true)}
                   className="p-3 mb-4 border border-dashed border-primary-blue rounded-lg cursor-pointer hover:bg-blue-50 transition duration-300"
@@ -299,10 +293,10 @@ const Checkout = () => {
                         />
                         <div className="ml-2">
                           <p className="text-base font-semibold">
-                            {address.house}
+                            {address.locality?address.locality:address.place}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {address.city}, {address.state}
+                            {address.place}, {address.state}
                           </p>
                           <p className="text-sm text-gray-600">
                             {address.country}
@@ -344,12 +338,12 @@ const Checkout = () => {
                   <input
                     type="radio"
                     name="paymentMethod"
-                    value="cod"
+                    value="cash"
                     className="mt-1"
                     onClick={(e) => setPaymentMethod(e.target.value)}
                   />
                   <label htmlFor="cod" className="flex items-center space-x-2">
-                    Cash on Delivery
+                    Cash on Service
                   </label>
                 </div>
                 <div className="flex space-x-3 p-4">
@@ -404,106 +398,9 @@ const Checkout = () => {
           <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
           <MdClose onClick={closeAddressModal} className="cursor-pointer" />
         </div>
-        <form className="space-y-4">
-          <div className="flex flex-col">
-            <label
-              htmlFor="addressName"
-              className="text-sm font-semibold text-gray-700"
-            >
-              House/Building
-            </label>
-            <input
-              type="text"
-              id="addressName"
-              name="addressName"
-              className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) =>
-                setAddress({ ...address, house: e.target.value })
-              }
-            />
-            {addressErrors.house && (
-              <p className="text-red-500 text-sm">{addressErrors.house}</p>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="city"
-              className="text-sm font-semibold text-gray-700"
-            >
-              City
-            </label>
-            <input
-              type="text"
-              id="city"
-              name="city"
-              className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => setAddress({ ...address, city: e.target.value })}
-            />
-            {addressErrors.city && (
-              <p className="text-red-500 text-sm">{addressErrors.city}</p>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="state"
-              className="text-sm font-semibold text-gray-700"
-            >
-              State
-            </label>
-            <input
-              type="text"
-              id="state"
-              name="state"
-              className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) =>
-                setAddress({ ...address, state: e.target.value })
-              }
-            />
-            {addressErrors.state && (
-              <p className="text-red-500 text-sm">{addressErrors.state}</p>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="country"
-              className="text-sm font-semibold text-gray-700"
-            >
-              Country
-            </label>
-            <input
-              type="text"
-              id="country"
-              name="country"
-              className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) =>
-                setAddress({ ...address, country: e.target.value })
-              }
-            />
-            {addressErrors.country && (
-              <p className="text-red-500 text-sm">{addressErrors.country}</p>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="pincode"
-              className="text-sm font-semibold text-gray-700"
-            >
-              Pincode
-            </label>
-            <input
-              type="text"
-              id="pincode"
-              name="pincode"
-              className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) =>
-                setAddress({ ...address, pincode: e.target.value })
-              }
-            />
-            {addressErrors.pincode && (
-              <p className="text-red-500 text-sm">{addressErrors.pincode}</p>
-            )}
-          </div>
-          <div className="flex justify-end">
+        <div>
+        <MapLocation setAddress={setAddress}/>
+        <div className="flex justify-end mt-12">
             <button
               type="button"
               className="ring-1 ring-primary-blue text-primary-blue py-2 px-4 rounded-md hover:bg-primary-blue hover:text-white"
@@ -512,7 +409,8 @@ const Checkout = () => {
               Add Address
             </button>
           </div>
-        </form>
+        </div>
+        
       </Modal>
       <Modal isOpen={isSlotOpen} onClose={closeSlotModal}>
         <div className="flex items-start justify-between p-3">

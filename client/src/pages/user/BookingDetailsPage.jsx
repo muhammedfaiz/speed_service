@@ -207,18 +207,18 @@ const BookingDetailsPage = () => {
             </h2>
             <div className="flex justify-between items-center">
               <span className="flex items-center text-sm font-medium text-gray-700">
-                <FaHome className="mr-2 text-blue-500" /> House:
+                <FaHome className="mr-2 text-blue-500" /> Locality:
               </span>
               <span className="text-sm text-gray-600">
-                {booking?.address?.house}
+                {booking?.address?.locality}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="flex items-center text-sm font-medium text-gray-700">
-                <FaCity className="mr-2 text-blue-500" /> City:
+                <FaCity className="mr-2 text-blue-500" /> Place:
               </span>
               <span className="text-sm text-gray-600">
-                {booking?.address?.city}
+                {booking?.address?.place}
               </span>
             </div>
             <div className="flex justify-between items-center">

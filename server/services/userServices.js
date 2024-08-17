@@ -81,11 +81,7 @@ export const serviceDataHelper = async (id) => {
 export const addAddressService = async (id, data) => {
   try {
     const address = new Address({
-      house: data.house,
-      city: data.city,
-      state: data.state,
-      country: data.country,
-      pincode: data.pincode,
+      ...data,
       user: id,
     });
     await address.save();

@@ -1,25 +1,20 @@
 import mongoose from 'mongoose';
 
 const addressSchema = new mongoose.Schema({
-    house:{
+    locality:{
         type:String,
-        required:true
     },
-    city:{
+    place:{
         type:String,
-        required:true
     },
     state:{
         type:String,
-        required:true
     },
     country:{
         type:String,
-        required:true
     },
     pincode:{
         type:Number,
-        required:true
     },
     user:{
         type:mongoose.Types.ObjectId,
