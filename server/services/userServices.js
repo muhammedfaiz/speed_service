@@ -179,7 +179,7 @@ export const getBookingDetailsHelper = async (id) => {
       .populate("address")
       .populate({
         path: "employee",
-        select: "name experience -_id",
+        select: "name experience",
       })
       .populate({
         path: "category",

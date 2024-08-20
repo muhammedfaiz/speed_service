@@ -57,7 +57,7 @@ const BookingsPage = () => {
                   </p>
                   <p className="mb-2 flex items-center">
                     <MdPayment className="mr-2 text-primary-blue" />
-                    <span className="font-medium">Payment Status:</span> {booking.paymentMethod === "paypal" ? "Paid" : "Not Paid"}
+                    <span className="font-medium">Payment:</span> {booking.paymentMethod}
                   </p>
                 </div>
                 <div className="flex justify-end space-x-4 mt-4">

@@ -83,10 +83,11 @@ export const getOrderRequests = async (employee) => {
     const requests = await Order.find({
       employee: null,
       category: employee.designation,
-      status:"Pending"
-    }).populate("user")
-    .populate('orderItems.item')
-    .populate("address");
+      status: "Pending",
+    })
+      .populate("user")
+      .populate("orderItems.item")
+      .populate("address");
     return requests;
   } catch (error) {
     console.log(error);
@@ -94,18 +95,41 @@ export const getOrderRequests = async (employee) => {
   }
 };
 
+export const acceptRequestService = async (data) => {
+  try {
+    const order = await Order.findByIdAndUpdate(data.orderId, {
+      $set: {
+        employee: data.employee,
+        status: "Commited",
+      },
+    });
+    return order;
+  } catch (error) {
+    throw new Error("Failed to accept order request");
+  }
+};
 
-export const acceptRequestService = async(data)=>{
-    try {
-        const order = await Order.findByIdAndUpdate(data.orderId, {
-            $set: {
-                employee: data.employee,
-                status: "Commited"
-            }
-        });
-        return order;
-    } catch (error) {
-        console.log(error);
-        throw new Error("Failed to accept order request");
-    }
-}
+export const getTasksService = async (employeeId) => {
+  try {
+    const tasks = await Order.find({ employee: employeeId, status: "Commited" })
+      .populate("user")
+      .populate("address")
+      .populate("orderItems.item");
+    return tasks;
+  } catch (error) {
+    throw new Error("Failed to get tasks service");
+  }
+};
+
+export const changeTaskCompleteService = async (id) => {
+  try {
+    const result = await Order.findByIdAndUpdate(id, {
+      $set: {
+        status: "Completed",
+      },
+    });
+    return result;
+  } catch (error) {
+    throw new Error("Failed to change status");
+  }
+};

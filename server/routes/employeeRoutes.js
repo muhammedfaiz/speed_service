@@ -1,5 +1,5 @@
 import express from 'express';
-import { acceptRequest, acceptService, application, employeeLogin, employeeLogout, employeeRefreshToken, getBookings, getCategories, getServiceData, rejectService } from '../controllers/employeeController.js';
+import { acceptRequest, acceptService, application, changeTaskComplete, employeeLogin, employeeLogout, employeeRefreshToken, getBookings, getCategories, getCommitedTasks, getServiceData, rejectService } from '../controllers/employeeController.js';
 import upload from '../middleware/uploadMiddleware.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
@@ -18,5 +18,7 @@ router.patch("/accept-service",authMiddleware,acceptService);
 router.patch("/reject-service",authMiddleware,rejectService);
 router.get("/requests/:token",authMiddleware,getBookings);
 router.patch("/accept-request",authMiddleware,acceptRequest);
+router.get("/tasks",authMiddleware,getCommitedTasks);
+router.patch("/task-complete",authMiddleware,changeTaskComplete);
 
 export default router;

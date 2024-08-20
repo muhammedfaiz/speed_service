@@ -105,3 +105,21 @@ export const acceptRequest = async(id)=>{
         throw error.response.data;
     }
 }
+
+export const getTasks = async()=>{
+    try {
+        const response = await axiosInstance.get("/tasks");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const taskComplete = async(id)=>{
+    try {
+        const response = await axiosInstance.patch("/task-complete",{id});
+        return response;
+    } catch (error) {
+        throw error.response.data;
+    }
+}

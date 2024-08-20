@@ -2,12 +2,14 @@ import {
   acceptRequestService,
   addService,
   applicationService,
+  changeTaskCompleteService,
   declineService,
   fetchEmployee,
   getCategoriesService,
   getEmployeeDetails,
   getOrderRequests,
   getServiceHelper,
+  getTasksService,
 } from "../services/employeeServices.js";
 import {
     addFileToS3,
@@ -73,7 +75,7 @@ export const employeeLogin = async (req, res) => {
     res
       .status(200)
       .json({
-        employee: { name: employee.name, email: employee.email },
+        employee: { id:employee._id, name: employee.name, email: employee.email },
         token: accessToken,
       });
   } catch (error) {
@@ -199,5 +201,30 @@ export const acceptRequest = async(req,res)=>{
     }
   } catch (error) {
     res.status(400).json({message:error.message});
+  }
+}
+
+export const getCommitedTasks = async(req,res)=>{
+  try {
+    const employeeId = req.user.id;
+    const data = await getTasksService(employeeId);
+    if(data){
+      res.status(200).json({tasks:data});
+    }
+  } catch (error) {
+    res.status(404).json({message:error.message});
+  }
+}
+
+
+export const changeTaskComplete = async(req,res)=>{
+  try {
+    const {id}=req.body;
+    const result = await changeTaskCompleteService(id);
+    if(result){
+      res.status(200).json({message:"Order completed successfully"});
+    }
+  } catch (error) {
+    res.status(400).json({message:"Failed to change status"});
   }
 }

@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import Modal from "../../components/common/Modal";
 import { MdClose } from "react-icons/md";
+import Chat from "../../components/common/Chat";
 
 const BookingDetailsPage = () => {
   const { id } = useParams();
@@ -30,6 +31,7 @@ const BookingDetailsPage = () => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [review, setReview] = useState({ id: null, rating: 0, comment: "" });
   const [errors, setErrors] = useState({});
+  const [isChatOpen,setIsChatOpen]=useState(false);
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -42,6 +44,7 @@ const BookingDetailsPage = () => {
     };
     fetchBooking();
   }, [id, isChange]);
+
 
   const validateReview = () => {
     const errors = {};
@@ -189,7 +192,7 @@ const BookingDetailsPage = () => {
                   </span>
                 </div>
                 <div className="w-full flex justify-end items-baseline p-4">
-                  <button className="ring-1 ring-primary-blue rounded-md px-3 py-2 text-primary-blue hover:bg-primary-blue hover:text-white transition-colors duration-100 flex items-center">
+                  <button onClick={()=>setIsChatOpen(true)} className="ring-1 ring-primary-blue rounded-md px-3 py-2 text-primary-blue hover:bg-primary-blue hover:text-white transition-colors duration-100 flex items-center">
                     <BsChatText className="mr-2" /> Chat
                   </button>
                 </div>
@@ -367,6 +370,7 @@ const BookingDetailsPage = () => {
           </div>
         </form>
       </Modal>
+     {booking?.employee && (<Chat isOpen={isChatOpen} setIsOpen={setIsChatOpen} receiver={booking.employee}/>)}
     </>
   );
 };
