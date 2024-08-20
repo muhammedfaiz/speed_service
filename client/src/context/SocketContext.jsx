@@ -4,6 +4,7 @@ import {io} from 'socket.io-client';
 
 export const SocketContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSocketContext = ()=>{
     return useContext(SocketContext);
 }
@@ -30,6 +31,6 @@ export const SocketProvider = ({ children }) => {
                 setSocket(null);
             }
         }
-    },[user,employee])
+    },[user,employee,socket])
     return <SocketContext.Provider value={{socket}}>{children}</SocketContext.Provider>
 }
