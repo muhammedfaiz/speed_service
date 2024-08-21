@@ -31,6 +31,7 @@ import ServiceAdd from "./pages/admin/ServiceAdd";
 import EditService from "./pages/admin/EditService";
 import AddCategoryPage from "./pages/admin/AddCategoryPage";
 import EmployeeTasks from "./pages/employee/EmployeeTasks";
+import HistoryPage from "./pages/employee/HistoryPage";
 
 function App() {
   return (
@@ -73,6 +74,7 @@ function App() {
       <Route path="/employee/services" element={<EmployeeServices/>}/>
       <Route path="/employee/requests" element={<EmployeeRequestPage/>}/>
       <Route  path="/employee/tasks" element={<EmployeeTasks/>}/>
+      <Route path="/employee/history" element = {<HistoryPage/>}/>
       </Route>
       
     </Routes>

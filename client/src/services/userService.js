@@ -229,6 +229,15 @@ export const getCheckout = async(id)=>{
   }
  }
 
+ const getCategories = async()=>{
+  try {
+    const response = await axiosInstance.get("/categories");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
 
 
 const userService = {
@@ -251,6 +260,7 @@ const userService = {
   fetchBookingDetails,
   getCheckout,
   cancelBooking,
-  submitReview
+  submitReview,
+  getCategories
 };
 export default userService;

@@ -7,6 +7,7 @@ import {
   createUser,
   expireOtp,
   fetchAllCartsHelper,
+  fetchCategoriesHelper,
   getAllUserAddress,
   getBookingDetailsHelper,
   getBookingsHelper,
@@ -447,6 +448,20 @@ const addReview = async(req,res)=>{
   }
 }
 
+const fetchCategories = async(req,res)=>{
+  try {
+    const data = await fetchCategoriesHelper();
+    const categories = JSON.parse(JSON.stringify(data));
+    for(let category of categories){
+      const url = await getFile(category.image);
+      category.imageUrl=url;
+    }
+    res.status(200).json({categories});
+  } catch (error) {
+    res.status(404).json({message:"Error fetching categories"});
+  }
+}
+
 export {
   userRegister,
   userLogin,
@@ -467,5 +482,6 @@ export {
   getBookingDetails,
   getCheckoutDetails,
   cancelBooking,
-  addReview
+  addReview,
+  fetchCategories
 };

@@ -5,6 +5,7 @@ import Address from "../models/Address.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Review from '../models/Review.js';
+import Category from "../models/Category.js";
 
 export const createUser = async ({ name, email, password, phone, otp }) => {
   try {
@@ -239,5 +240,15 @@ export const getReviewData = async(id)=>{
     return result;
   } catch (error) {
     throw new Error("Failed to get review data");
+  }
+}
+
+
+export const fetchCategoriesHelper = async()=>{
+  try {
+    const result = await Category.find();
+    return result;
+  } catch (error) {
+    throw new Error("Failed to fetch categories");
   }
 }

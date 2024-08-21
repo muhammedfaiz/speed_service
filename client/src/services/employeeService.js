@@ -123,3 +123,12 @@ export const taskComplete = async(id)=>{
         throw error.response.data;
     }
 }
+
+export const getCompletedTasks = async()=>{
+    try {
+        const response = await axiosInstance.get("/history");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}

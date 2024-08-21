@@ -133,3 +133,18 @@ export const changeTaskCompleteService = async (id) => {
     throw new Error("Failed to change status");
   }
 };
+
+export const getHistoryService = async(id)=>{
+  try{
+    const history = await Order.find({ employee: id, status: "Completed" })
+     .populate({
+       path: 'user',
+       select: 'name -_id'
+     })
+     .populate("address")
+     .populate("orderItems.item");
+    return history;
+  }catch(error){
+    throw new Error("Failed to get history");
+  }
+}

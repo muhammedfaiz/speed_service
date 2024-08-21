@@ -20,6 +20,7 @@ export const getReceiverSocketId=(receiverId)=>{
 const userSocketMap = {};
 
 io.on('connection', (socket)=>{
+    console.log('a user connected',socket.id);
     const userId = socket.handshake.query.userId;
     const employeeId = socket.handshake.query.employeeId;
     if(userId!=undefined) userSocketMap[userId]=socket.id;
