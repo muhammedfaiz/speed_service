@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import Address from "../models/Address.js";
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
-import Review from '../models/Review.js';
+import Review from "../models/Review.js";
 import Category from "../models/Category.js";
 
 export const createUser = async ({ name, email, password, phone, otp }) => {
@@ -210,11 +210,13 @@ export const cancelBookingHelper = async (id) => {
   }
 };
 
-export const addReviewHelper = async (serviceId,userId,rating,comment)=>{
+export const addReviewHelper = async (serviceId, userId, rating, comment) => {
   try {
-    const review = await Review.findOne({service:serviceId,user:userId});
-    if(review){
-      await Review.findByIdAndUpdate(review._id,{$set:{rating:parseInt(rating),comment}});
+    const review = await Review.findOne({ service: serviceId, user: userId });
+    if (review) {
+      await Review.findByIdAndUpdate(review._id, {
+        $set: { rating: parseInt(rating), comment },
+      });
       return review;
     }
     const data = {
@@ -229,26 +231,79 @@ export const addReviewHelper = async (serviceId,userId,rating,comment)=>{
   } catch (error) {
     throw new Error("Failed to add review");
   }
-}
+};
 
-export const getReviewData = async(id)=>{
+export const getReviewData = async (id) => {
   try {
-    const result = await Review.find({service:id}).populate({
-      path: 'user',
-      select: 'name -_id'
+    const result = await Review.find({ service: id }).populate({
+      path: "user",
+      select: "name -_id",
     });
     return result;
   } catch (error) {
     throw new Error("Failed to get review data");
   }
-}
+};
 
-
-export const fetchCategoriesHelper = async()=>{
+export const fetchCategoriesHelper = async () => {
   try {
     const result = await Category.find();
     return result;
   } catch (error) {
     throw new Error("Failed to fetch categories");
   }
-}
+};
+
+export const updateProfileImageService = async (id, fileName) => {
+  try {
+    const user = await User.findById(id);
+    user.image = fileName;
+    await user.save();
+    return user;
+  } catch (error) {
+    throw new Error("Failed to update profile image service");
+  }
+};
+
+export const updateProfileService = async (id, data) => {
+  try {
+    const user = await User.findByIdAndUpdate(id, { $set: data });
+    return user;
+  } catch (error) {
+    throw new Error("Failed to update profile service");
+  }
+};
+
+export const getStatsOfUserHelper = async (id) => {
+  try {
+    const booked = await Order.find({ user: id });
+    const completed = booked.filter((order) => order.status === "Completed");
+    const pending = booked.filter(
+      (order) => order.status === "Pending" && order.status === "Commited"
+    );
+    return {
+      booked: booked.length,
+      completed: completed.length,
+      pending: pending.length,
+    };
+  } catch (error) {
+    throw new Error("Failed to get stats of user");
+  }
+};
+
+export const getRating = async (id) => {
+  try {
+    const reviews = await Review.find({ service: id });
+    if (reviews.length > 0) {
+      let avgRating = 0;
+      let sumRating = 0;
+      reviews.forEach((review) => {
+        sumRating += review.rating;
+      });
+      avgRating = sumRating / reviews.length;
+      return avgRating;
+    }
+  } catch (error) {
+    throw new Error("Failed to get rating of user");
+  }
+};

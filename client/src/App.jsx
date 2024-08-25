@@ -32,22 +32,27 @@ import EditService from "./pages/admin/EditService";
 import AddCategoryPage from "./pages/admin/AddCategoryPage";
 import EmployeeTasks from "./pages/employee/EmployeeTasks";
 import HistoryPage from "./pages/employee/HistoryPage";
+import ProfilePage from "./pages/user/ProfilePage";
+import ServiceListPage from "./pages/user/ServiceListPage";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop/>
     <Routes>
-
       {/* User Routes */}
       <Route path="/signup" element={<RegisterationPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<HomePage/>}/>
+      <Route path="/services" element={<ServiceListPage/>}/>
       <Route path="/service/:id" element={<ServiceBookingPage/>}/>
       <Route path="/cart" element={<CartPage/>}/>
       <Route path="/checkout/:id" element={<Checkout/>}/>
       <Route path="/success" element={<SuccessOrderPage/>}/>
       <Route path="/bookings" element={<BookingsPage/>}/>
       <Route path="/booking-details/:id" element={<BookingDetailsPage/>}/>
+      <Route path="/profile" element={<ProfilePage/>}/>
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLoginPage />} />

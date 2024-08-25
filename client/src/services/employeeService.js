@@ -132,3 +132,21 @@ export const getCompletedTasks = async()=>{
         throw error.response.data;
     }
 }
+
+export const fetchEmployeeStats = async()=>{
+    try {
+        const response = await axiosInstance.get("/getStats");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const fetchRecentActivities = async()=>{
+    try {
+        const response = await axiosInstance.get("/recentActivities");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}

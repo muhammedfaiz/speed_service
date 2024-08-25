@@ -27,13 +27,13 @@ const Banner = () => {
         <div className="mt-11 flex justify-start space-x-8">
           <button
             onClick={() => navigate("/employee/application")}
-            className="text-primary-blue font-medium ring-1 ring-primary-blue p-3 rounded-lg hover:bg-primary-blue hover:text-white ease-in-out "
+            className="text-primary-blue font-medium ring-1 ring-primary-blue p-3 rounded-lg hover:bg-primary-blue hover:text-white transform hover:-translate-y-1 transition-all ease-in-out"
           >
             Provide Service
           </button>
           <button
             onClick={() => navigate("/services")}
-            className="text-white font-medium bg-primary-blue p-3 rounded-lg hover:bg-secondary-blue hover:text-black"
+            className="text-white font-medium bg-primary-blue p-3 rounded-lg hover:bg-secondary-blue transform hover:-translate-y-1 transition-all ease-in-out"
           >
             Get Service
           </button>

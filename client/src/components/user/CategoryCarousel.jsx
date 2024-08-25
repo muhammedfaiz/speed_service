@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import userService from '../../services/userService.js';
-
 
 const CategoryCarousel = () => {
   const carouselRef = useRef(null);
-  const [categories,setCategories]=useState([]);
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
-  useEffect(()=>{
-    const fetchCategories = async()=>{
+  useEffect(() => {
+    const fetchCategories = async () => {
       const response = await userService.getCategories();
       setCategories(response.categories);
-    }
+    };
     fetchCategories();
-  },[])
+  }, []);
 
   const scrollLeft = () => {
     if (carouselRef.current) {
@@ -26,6 +27,10 @@ const CategoryCarousel = () => {
     if (carouselRef.current) {
       carouselRef.current.scrollBy({ left: 300, behavior: "smooth" });
     }
+  };
+
+  const handleCategoryClick = (categoryName) => {
+    navigate(`/services?category=${encodeURIComponent(categoryName)}`);
   };
 
   return (
@@ -42,16 +47,14 @@ const CategoryCarousel = () => {
       >
         <FaArrowRight />
       </button>
-      <div
-        ref={carouselRef}
-        className="flex space-x-6 overflow-x-hidden px-4"
-      >
+      <div ref={carouselRef} className="flex space-x-6 overflow-x-hidden px-4">
         {categories.map((category) => (
           <motion.div
             animate={{ x: [300, 0] }}
             transition={{ duration: 2 }}
             key={category._id}
-            className="w-48 flex-shrink-0 bg-white rounded-lg"
+            className="w-48 flex-shrink-0 bg-white rounded-lg cursor-pointer"
+            onClick={() => handleCategoryClick(category.name)}
           >
             <img
               src={category.imageUrl}

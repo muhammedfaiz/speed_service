@@ -58,6 +58,30 @@ export const logout = createAsyncThunk("user/logout", async (_, thunkApi) => {
   }
 });
 
+export const getProfile = createAsyncThunk("user/getProfile",async (_,thunkApi)=>{
+  try {
+    return await userService.getProfileService();
+  } catch (error) {
+    return thunkApi.rejectWithValue(error);
+  }
+});
+
+export const changeProfileImage = createAsyncThunk("user/changeProfileImage",async (data,thunkApi)=>{
+  try {
+    return await userService.changeProfileImageService(data);
+  } catch (error) {
+    return thunkApi.rejectWithValue(error);
+  }
+});
+
+export const updateProfileDetails = createAsyncThunk("user/updateProfileDetails",async(data,thunkApi)=>{
+  try {
+    return await userService.updateProfileDetailsService(data);
+  } catch (error) {
+    return thunkApi.rejectWithValue(error);
+  }
+})
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -153,6 +177,38 @@ const userSlice = createSlice({
         state.isSuccess = false;
         state.error = action.payload;
       })
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProfile.fulfilled,(state,action)=>{
+        state.loading = false;
+        state.isSuccess = true;
+        state.error = null;
+        state.user = action.payload;
+      })
+      .addCase(getProfile.rejected,(state,action)=>{
+        state.loading = false;
+        state.isSuccess = false;
+        state.error = action.payload;
+      })
+      .addCase(changeProfileImage.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(changeProfileImage.fulfilled,(state,action)=>{
+        state.loading = false;
+        state.isSuccess = true;
+        state.error = null;
+        state.user = {...state.user,...action.payload };
+      })
+      .addCase(updateProfileDetails.pending,(state)=>{
+        state.loading = true;
+      })
+      .addCase(updateProfileDetails.fulfilled,(state,action)=>{
+        state.loading = false;
+        state.isSuccess = true;
+        state.error = null;
+        state.user = {...state.user,...action.payload };
+      });
   },
 });
 export const { reset } = userSlice.actions;

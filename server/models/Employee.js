@@ -25,8 +25,7 @@ const employeeSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "blocked", "not-active"],
-      default: "not-active",
+      enum: ["active", "blocked"],
     },
     proof: {
       type: String,

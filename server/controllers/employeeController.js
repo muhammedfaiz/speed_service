@@ -6,10 +6,15 @@ import {
   declineService,
   fetchEmployee,
   getCategoriesService,
+  getCompletionRate,
+  getEarnings,
   getEmployeeDetails,
   getHistoryService,
   getOrderRequests,
+  getRecentActivitiesService,
+  getRequestsCount,
   getServiceHelper,
+  getTaskCompleted,
   getTasksService,
 } from "../services/employeeServices.js";
 import {
@@ -236,5 +241,30 @@ export const getHistory = async(req,res)=>{
     res.status(200).json({history});
   } catch (error) {
     res.status(404).json({message:"Failed to get history"});
+  }
+}
+
+export const getStats = async(req,res)=>{
+  try {
+    const id = req.user.id;
+    const completed = await getTaskCompleted(id);
+    const pendingRequest = await getRequestsCount(id);
+    const earnings = await getEarnings(id);
+    const completionRate = await getCompletionRate(id);
+    res.status(200).json({completed,pendingRequest,earnings,completionRate});
+  } catch (error) {
+    res.status(404).json({message:"Failed to get stats"});
+  }
+}
+
+export const getRecentActivities = async(req,res)=>{
+  try {
+    const id = req.user.id;
+    const activities = await getRecentActivitiesService(id);
+    if(activities){
+      res.status(200).json({activities});
+    }
+  } catch (error) {
+    res.stats(404).json({message:"Failed to get recent activities"});
   }
 }

@@ -238,7 +238,41 @@ export const getCheckout = async(id)=>{
   }
  }
 
+ const getProfileService = async()=>{
+  try {
+    const response = await axiosInstance.get("/profile");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
 
+ const changeProfileImageService = async(data)=>{
+  try {
+    const response = await axiosInstance.patch("/profile-image",data,{headers: {'Content-Type':'multipart/form-data'}});
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
+ const updateProfileDetailsService = async(data)=>{
+  try {
+    const response = await axiosInstance.patch("/profile",data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
+ const getStatsOfUser = async()=>{
+  try {
+    const response = await axiosInstance.get("/stats");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
 
 const userService = {
   register,
@@ -261,6 +295,10 @@ const userService = {
   getCheckout,
   cancelBooking,
   submitReview,
-  getCategories
+  getCategories,
+  getProfileService,
+  changeProfileImageService,
+  updateProfileDetailsService,
+  getStatsOfUser,
 };
 export default userService;

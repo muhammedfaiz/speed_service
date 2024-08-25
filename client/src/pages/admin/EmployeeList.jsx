@@ -41,7 +41,7 @@ const EmployeeList = () => {
       setIsChanged(!isChanged);
       toast.success(res.message);
     } catch (error) {
-        toast.error(error.message);
+      toast.error(error.message);
     }
   }
   return (
@@ -168,35 +168,21 @@ const EmployeeList = () => {
                           <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                             {item.status == "active" ? (
                               <span
-                              onClick={() =>
-                                handleStatus(item.id, "not-active")
-                              }
-                              className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer">
+                                onClick={() => handleStatus(item.id, "blocked")}
+                                className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer"
+                              >
                                 <span
                                   aria-hidden="true"
                                   className="absolute inset-0 bg-green-400 rounded-full opacity-50"
                                 ></span>
                                 <span className="relative">active</span>
                               </span>
-                            ) : item.status === "not-active" ? (
-                              <span 
-                              onClick={() =>
-                                handleStatus(item.id, "blocked")
-                              }
-                              className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer">
-                                <span
-                                  aria-hidden="true"
-                                  className="absolute inset-0 bg-blue-400 rounded-full opacity-50"
-                                ></span>
-                                <span className="relative">not-active</span>
-                              </span>
                             ) : (
-                              <span 
-                              onClick={() =>
-                                handleStatus(item.id, "active")
-                              }
-                              className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer">
-                                <span 
+                              <span
+                                onClick={() => handleStatus(item.id, "active")}
+                                className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer"
+                              >
+                                <span
                                   aria-hidden="true"
                                   className="absolute inset-0 bg-red-400 rounded-full opacity-50"
                                 ></span>

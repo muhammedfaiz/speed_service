@@ -112,7 +112,10 @@ export const acceptRequestService = async (data) => {
 export const getTasksService = async (employeeId) => {
   try {
     const tasks = await Order.find({ employee: employeeId, status: "Commited" })
-      .populate("user")
+      .populate({
+        path: 'user',
+        select: '-password'
+      })
       .populate("address")
       .populate("orderItems.item");
     return tasks;
@@ -146,5 +149,63 @@ export const getHistoryService = async(id)=>{
     return history;
   }catch(error){
     throw new Error("Failed to get history");
+  }
+}
+
+export const getTaskCompleted = async(id)=>{
+  try{
+    const result = await Order.find({ employee: id, status: "Completed" });
+    return result.length;
+  }catch(error){
+    throw new Error("Failed to get task completed");
+  }
+}
+
+export const getRequestsCount = async (id)=>{
+  try {
+    const employee = await Employee.findById(id);
+    const requests = await Order.find({
+      employee: null,
+      category: employee.designation,
+      status: "Pending",
+    }).countDocuments();
+    return requests;
+  } catch (error) {
+    throw new Error("Failed to get requests");
+  }
+}
+
+export const getEarnings = async(id)=>{
+  try {
+    const data = await Order.find({employee:id,status:"Completed"});
+    let totalEarnings = 0;
+    data.forEach(item=>{
+      totalEarnings+=item.orderItems.reduce((sum,i)=>sum+i.price*i.quantity,0);
+    });
+    return totalEarnings;
+  } catch (error) {
+    throw new Error("Failed to get earnings");
+  }
+}
+
+export const getCompletionRate = async(id)=>{
+  try {
+    const completedTasks = await getTaskCompleted(id);
+    const totalTaskCommited = await Order.find({employee:id}).countDocuments();
+    if(totalTaskCommited===0) return 0;
+
+    return Math.round((completedTasks/totalTaskCommited)*100);
+  } catch (error) {
+    throw new Error("Failed to get completion rate");
+  }
+}
+
+
+export const getRecentActivitiesService = (id)=>{
+  try{
+    const recentActivities = Order.find({employee:id,status:"Completed"}).sort({updatedAt: -1}).limit(5);
+    return recentActivities;
+  }catch(error){
+    throw new Error("Failed to get recent activities");
   }
 }
