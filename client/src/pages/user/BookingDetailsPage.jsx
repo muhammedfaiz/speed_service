@@ -279,7 +279,7 @@ const BookingDetailsPage = () => {
                 <div>
                   {booking.status == "Completed" && (
                     <span
-                      className="text-base text-primary-blue hover:text-secondary-blue cursor-pointer"
+                      className="text-sm text-primary-blue hover:text-secondary-blue cursor-pointer lg:text-base"
                       onClick={() => {
                         setIsReviewOpen(true);
                         setReview({ id: item.item._id });

@@ -5,6 +5,7 @@ import Category from "../models/Category.js";
 import Application from "../models/Application.js";
 import Employee from "../models/Employee.js";
 import Service from "../models/Service.js";
+import Order from "../models/Order.js";
 
 export const createAdmin = async ({ name, email, password }) => {
   try {
@@ -80,7 +81,10 @@ export const addCategoryService = async (data, fileName) => {
 
 export const getAllCategoriesService = async () => {
   try {
-    return await Category.aggregate([{$match:{}},{$sort:{'updatedAt':-1}}]);
+    return await Category.aggregate([
+      { $match: {} },
+      { $sort: { updatedAt: -1 } },
+    ]);
   } catch (error) {
     throw new Error(error);
   }
@@ -106,10 +110,12 @@ export const deleteCategoryService = async (id) => {
 
 export const getApplicationService = async () => {
   try {
-    let applications = await Application.find().populate({
-      path: "designation",
-      select: "name -_id",
-    }).sort({updatedAt:-1});
+    let applications = await Application.find()
+      .populate({
+        path: "designation",
+        select: "name -_id",
+      })
+      .sort({ updatedAt: -1 });
     return applications;
   } catch (error) {
     console.log(error);
@@ -147,17 +153,20 @@ export const setEmployee = async (data, code) => {
 
 export const getEmployeeService = async () => {
   try {
-    let employees = await Employee.find({},{
-        name:1,
-        email:1,
-        phone:1,
-        designation:1,
-        experience:1,
-        status:1,
-        createdAt:1,
-    }).populate({
-        path:"designation",
-        select: "name -_id",
+    let employees = await Employee.find(
+      {},
+      {
+        name: 1,
+        email: 1,
+        phone: 1,
+        designation: 1,
+        experience: 1,
+        status: 1,
+        createdAt: 1,
+      }
+    ).populate({
+      path: "designation",
+      select: "name -_id",
     });
     return employees;
   } catch (error) {
@@ -166,67 +175,134 @@ export const getEmployeeService = async () => {
   }
 };
 
-export const changeEmployeeStatusService = async(id,status)=>{
-    try {
-        let employee = await Employee.findById(id);
-        employee.status = status;
-        await employee.save();
-        return "Employee status changed successfully";
-    } catch (error) {
-        throw new Error("Failed to change employee status");
-    }
-}
+export const changeEmployeeStatusService = async (id, status) => {
+  try {
+    let employee = await Employee.findById(id);
+    employee.status = status;
+    await employee.save();
+    return "Employee status changed successfully";
+  } catch (error) {
+    throw new Error("Failed to change employee status");
+  }
+};
 
-
-export const addServiceHelper = async(data)=>{
-  try{
+export const addServiceHelper = async (data) => {
+  try {
     let service = new Service(data);
     await service.save();
     return service;
-  }catch(error){
+  } catch (error) {
     throw new Error("Failed to add service");
   }
-}
+};
 
-export const getServicesData = async()=>{
-  try{
-    let services = await Service.find().populate({
-      path:'category',
-      select:'name -_id',
-    }).sort({updatedAt:-1});
+export const getServicesData = async () => {
+  try {
+    let services = await Service.find()
+      .populate({
+        path: "category",
+        select: "name -_id",
+      })
+      .sort({ updatedAt: -1 });
     return services;
-  }catch(error){
-    console.log(error)
+  } catch (error) {
+    console.log(error);
     throw new Error("Failed to get services");
   }
-}
+};
 
-export const deleteServiceHelper = async(id)=>{
-  try{
+export const deleteServiceHelper = async (id) => {
+  try {
     let service = await Service.findByIdAndDelete(id);
     return service;
-  }catch(error){
+  } catch (error) {
     throw new Error("Failed to delete service");
   }
-}
+};
 
-export const serviceData = async(id)=>{
-  try{
+export const serviceData = async (id) => {
+  try {
     let service = await Service.findById(id);
     return service;
-  }catch(error){
+  } catch (error) {
     throw new Error("Failed to get service data");
   }
-}
+};
 
-export const updateServiceHelper = async(id,data)=>{
+export const updateServiceHelper = async (id, data) => {
   try {
-    let service = await Service.findByIdAndUpdate(id,{
+    let service = await Service.findByIdAndUpdate(id, {
       $set: data,
     });
     return service;
   } catch (error) {
     console.log(error);
     throw new Error("Failed to update service");
+  }
+};
+
+export const getAllOrdersService = async () => {
+  try {
+    let orders = await Order.find()
+      .populate({
+        path: "user",
+        select: "name -_id",
+      })
+      .populate({
+        path: "category",
+        select: "name -_id",
+      })
+      .populate({ path: "employee", select: "name -_id" })
+      .populate("orderItems.item").sort({updatedAt: -1});
+      return orders;
+  } catch (error) {
+    throw new Error("Failed to get all orders service");
+  }
+};
+
+export const fetchOrderService = async(id)=>{
+  try {
+    let order = await Order.findById(id).populate({
+      path: "user",
+      select: "name -_id",
+    })
+    .populate({
+      path: "category",
+      select: "name -_id",
+    })
+    .populate({ path: "employee", select: "name -_id" })
+    .populate("orderItems.item")
+    .populate("address");
+    return order;
+  } catch (error) {
+    throw new Error("Failed to get order details");
+  }
+}
+
+
+export const getSalesDataService = async () => {
+  try {
+    const orders = await Order.find(); 
+    return orders;
+  } catch (error) {
+    throw new Error("Failed to get sales data");
+  }
+};
+
+export const getCategoryDetailsService = async(id)=>{
+  try {
+    const category = await Category.findById(id);
+    return category;
+  } catch (error) {
+    throw new Error("Failed to get category details");
+  }
+}
+
+export const updateCategoryDetailsService = async(id,data)=>{
+  try{
+    const category = await Category.findByIdAndUpdate(id,data);
+    return category;
+  }catch(error){
+    throw new Error("Failed to update category details");
   }
 }

@@ -1,4 +1,4 @@
-import { FaUser, FaUsers, FaList, FaBoxOpen , FaShoppingCart, FaUserFriends, FaChartBar, FaUserCircle } from 'react-icons/fa';
+import { FaUser, FaUsers, FaList, FaBoxOpen , FaShoppingCart, FaUserFriends, FaChartBar } from 'react-icons/fa';
 import { MdDashboard } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 
@@ -55,12 +55,6 @@ const Navbar = () => {
           onClick={() => navigate("/admin/sales-report")}
         >
           <FaChartBar className="mr-3" /> Sales Report
-        </li>
-        <li
-          className="flex items-center hover:bg-blue-500 rounded-lg p-2 cursor-pointer transition-colors duration-200"
-          onClick={() => navigate("/admin/profile")}
-        >
-          <FaUserCircle className="mr-3" /> Profile
         </li>
       </ul>
     </nav>

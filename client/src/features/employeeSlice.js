@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginService, logoutService } from "../services/employeeService";
+import { getProfileService, loginService, logoutService, updateEmployeeProfileService } from "../services/employeeService";
 
 
 const initialState = {
     isLoggedIn: false,
-    employee: null,
+    employee: localStorage.getItem("employee")||null,
     error: null,
     token:null,
 }
@@ -24,6 +24,22 @@ export const logout = createAsyncThunk("employee/logout", async (_,thunkApi)=>{
         return thunkApi.rejectWithValue(error.message);
     }
 });
+
+export const getProfile = createAsyncThunk("employee/getProfile",async(_,thunkApi)=>{
+    try{
+        return await getProfileService();
+    }catch(error){
+        return thunkApi.rejectWithValue(error);
+    }
+})
+
+export const updateEmployeeProfile = createAsyncThunk("employee/updateEmployeeProfile",async(data,thunkApi)=>{
+    try {
+        return await updateEmployeeProfileService(data);
+    } catch (error) {
+        return thunkApi.rejectWithValue(error);
+    }
+})
 
 export const employeeSlice = createSlice({
     name: "employee",
@@ -54,6 +70,13 @@ export const employeeSlice = createSlice({
         .addCase(logout.rejected,(state,action)=>{
             state.error = action.payload;
             state.isLoggedIn = false;
+        })
+        .addCase(getProfile.fulfilled,(state,action)=>{
+            state.employee = action.payload;
+        })
+        .addCase(updateEmployeeProfile.fulfilled,(state,action)=>{
+            console.log(action.payload);
+            state.employee = action.payload;
         })
     }
 });

@@ -26,12 +26,6 @@ const ProfileDropdown = () => {
           <ul className="py-1">
             <li
               className="block px-4 py-2 text-gray-700 hover:bg-gray-200 cursor-pointer"
-              onClick={() => console.log('Profile clicked')}
-            >
-              Profile
-            </li>
-            <li
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-200 cursor-pointer"
               onClick={handleLogout}
             >
               Logout

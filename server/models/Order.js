@@ -80,15 +80,13 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.pre("save", async function (next) {
   if (this.isNew) {
-    const orderPrefix = "ORD";
-    const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, ""); 
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString(); 
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit random number
 
-    this.orderId = `${orderPrefix}-${currentDate}-${randomSuffix}`;
+    this.orderId = randomSuffix;
   }
   next();
 });
-
+  
 const Order = mongoose.model("Order", orderSchema);
 
 export default Order;

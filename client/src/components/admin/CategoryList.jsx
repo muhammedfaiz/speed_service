@@ -5,6 +5,7 @@ import {
   getCategoriesService,
 } from "../../services/adminService";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 const CategoryList = () => {
   const [data, setData] = useState([]);
@@ -132,12 +133,12 @@ const CategoryList = () => {
                           </td>
 
                           <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                            <a
-                              href="#"
+                            <Link
+                              to={`/admin/edit-category/${category._id}`}
                               className="text-indigo-600 hover:text-indigo-900"
                             >
                               Edit
-                            </a>
+                            </Link>
                           </td>
                           <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                             <a

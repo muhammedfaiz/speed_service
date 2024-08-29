@@ -197,3 +197,57 @@ export const updateService = async(id,data)=>{
         throw error.response.data;
     }
 }
+
+export const getOrdersService = async()=>{
+    try {
+        let response = await axiosInstance.get("/orders");
+        return response.data; 
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const getOrderDetails = async(id)=>{
+    try {
+        let response = await axiosInstance.get(`/order/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const salesDataService = async()=>{
+    try {
+        let response = await axiosInstance.get("/sales-data");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const getDashboardDataService = async()=>{
+    try {
+        let response = await axiosInstance.get("/dashboard");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const getCategoryDetails = async(id)=>{
+    try {
+        let response = await axiosInstance.get(`/category/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const updateCategory = async(id,data)=>{
+    try {
+        let response = await axiosInstance.patch(`/category/${id}`,data,{headers:{'Content-Type':'multipart/form-data'}});
+        return response;
+    } catch (error) {
+        throw error.response.data;
+    }
+}

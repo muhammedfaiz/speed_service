@@ -6,12 +6,13 @@ import { changeUserStatus, fetchUsers } from "../../services/adminService";
 import { toast } from "react-toastify";
 
 const UserList = () => {
-  const [data,setData]=useState([]);
-  const [filteredUsers,setFilteredUsers]=useState(data);
-  const [search,setSearch]=useState('');
-  const [fetchTrigger,setFetchTrigger]=useState(0);
-  useEffect(()=>{
-    const getUsers = async()=>{
+  const [data, setData] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [search, setSearch] = useState('');
+  const [fetchTrigger, setFetchTrigger] = useState(0);
+
+  useEffect(() => {
+    const getUsers = async () => {
       try {
         const response = await fetchUsers();
         setData(response);
@@ -19,29 +20,31 @@ const UserList = () => {
       } catch (error) {
         toast.error(error.message);
       }
-    }
+    };
     getUsers();
-  },[fetchTrigger]);
-
+  }, [fetchTrigger]);
 
   const handleSearch = () => {
-    if(search===""){
-        setFilteredUsers(data);
-    }else{
-        const users = data.filter((user)=>user.name.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase()));
-        setFilteredUsers(users);
+    if (search === "") {
+      setFilteredUsers(data);
+    } else {
+      const users = data.filter((user) =>
+        user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredUsers(users);
     }
   };
 
-  const handleStatusChange = async(userId,status) =>{
-    try{
-       await changeUserStatus({userId,status});
-       toast.success("User status changed !")
-    }catch(error){
-      toast.error(error.message)
+  const handleStatusChange = async (userId, status) => {
+    try {
+      await changeUserStatus({ userId, status });
+      toast.success("User status changed!");
+      setFetchTrigger((prevState) => prevState + 1); // Refresh user data after status change
+    } catch (error) {
+      toast.error(error.message);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
@@ -57,139 +60,96 @@ const UserList = () => {
         </div>
         <div className="mt-10">
           <div className="container max-w-3xl px-4 mx-auto sm:px-8">
-            {data && (
-              <div className="py-8">
-                <div className="flex flex-row justify-between w-full mb-1 sm:mb-0">
-                  <h2 className="text-2xl leading-tight">Users</h2>
-                  <div className="text-end">
-                    <form className="flex flex-col justify-center w-3/4 max-w-sm space-y-3 md:flex-row md:w-full md:space-x-3 md:space-y-0">
-                      <div className=" relative ">
-                        <input
-                          type="text"
-                          id='"form-subscribe-Filter'
-                          className=" rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                          placeholder="Search"
-                          onChange={(e) => setSearch(e.target.value)}
-                        />
-                      </div>
-                      <button
-                        className="flex-shrink-0 px-4 py-2 text-base font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-200"
-                        type="button"
-                        onClick={() => handleSearch()}
-                      >
-                        Search
-                      </button>
-                    </form>
-                  </div>
+            <div className="py-8">
+              <div className="flex flex-row justify-between w-full mb-1 sm:mb-0">
+                <h2 className="text-2xl leading-tight">Users</h2>
+                <div className="text-end">
+                  <form className="flex flex-col justify-center w-3/4 max-w-sm space-y-3 md:flex-row md:w-full md:space-x-3 md:space-y-0">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="form-subscribe-Filter"
+                        className="rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                        placeholder="Search"
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      className="flex-shrink-0 px-4 py-2 text-base font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-200"
+                      type="button"
+                      onClick={handleSearch}
+                    >
+                      Search
+                    </button>
+                  </form>
                 </div>
-                <div className="px-4 py-4 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
-                  <div className="inline-block min-w-full overflow-hidden rounded-lg shadow">
-                    <table className="min-w-full leading-normal">
-                      <thead>
+              </div>
+              <div className="px-4 py-4 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
+                <div className="inline-block min-w-full overflow-hidden rounded-lg shadow">
+                  <table className="min-w-full leading-normal">
+                    <thead>
+                      <tr>
+                        <th className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">User</th>
+                        <th className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">Email</th>
+                        <th className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">Phone</th>
+                        <th className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">Created at</th>
+                        <th className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredUsers.length === 0 ? (
                         <tr>
-                          <th
-                            scope="col"
-                            className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200"
-                          >
-                            User
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200"
-                          >
-                            Email
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200"
-                          >
-                            Phone
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200"
-                          >
-                            Created at
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200"
-                          >
-                            status
-                          </th>
+                          <td colSpan="5" className="px-5 py-5 text-sm bg-white border-b border-gray-200 text-center">
+                            No users found
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {filteredUsers &&
-                          filteredUsers.map((user) => {
-                            return (
-                              <tr key={user._id}>
-                                <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                  <div className="flex items-center">
-                                    <div className="ml-3">
-                                      <p className="text-gray-900 whitespace-no-wrap">
-                                        {user.name}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                  <p className="text-gray-900 whitespace-no-wrap">
-                                    {user.email}
-                                  </p>
-                                </td>
-                                <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                  <p className="text-gray-900 whitespace-no-wrap">
-                                    {user.phone}
-                                  </p>
-                                </td>
-                                <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                  <p className="text-gray-900 whitespace-no-wrap">
-                                    {user.createdAt}
-                                  </p>
-                                </td>
-                                <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                  {user.status ? (
-                                    <span
-                                      className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer"
-                                      onClick={() =>
-                                        handleStatusChange(
-                                          user._id,
-                                          !user.status
-                                        )
-                                      }
-                                    >
-                                      <span
-                                        aria-hidden="true"
-                                        className="absolute inset-0 bg-green-400 rounded-full opacity-50"
-                                      ></span>
-                                      <span className="relative">active</span>
-                                    </span>
-                                  ) : (
-                                    <span
-                                      className="relative inline-block px-3 py-1 font-semibold leading-tight text-red-900 hover:cursor-pointer"
-                                      onClick={() =>{
-                                        handleStatusChange(
-                                          user._id,
-                                          !user.status
-                                        )
-                                        setFetchTrigger(prevState=>prevState+1);
-                                      }
-                                      }
-                                    >
-                                      <span
-                                        aria-hidden="true"
-                                        className="absolute inset-0 bg-red-400 rounded-full opacity-50"
-                                      ></span>
-                                      <span className="relative">Blocked</span>
-                                    </span>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
+                      ) : (
+                        filteredUsers.map((user) => (
+                          <tr key={user._id}>
+                            <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                              <div className="flex items-center">
+                                <div className="ml-3">
+                                  <p className="text-gray-900 whitespace-no-wrap">{user.name}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                              <p className="text-gray-900 whitespace-no-wrap">{user.email}</p>
+                            </td>
+                            <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                              <p className="text-gray-900 whitespace-no-wrap">{user.phone}</p>
+                            </td>
+                            <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                              <p className="text-gray-900 whitespace-no-wrap">{user.createdAt}</p>
+                            </td>
+                            <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                              {user.status ? (
+                                <span
+                                  className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer"
+                                  onClick={() => handleStatusChange(user._id, !user.status)}
+                                >
+                                  <span aria-hidden="true" className="absolute inset-0 bg-green-400 rounded-full opacity-50"></span>
+                                  <span className="relative">Active</span>
+                                </span>
+                              ) : (
+                                <span
+                                  className="relative inline-block px-3 py-1 font-semibold leading-tight text-red-900 hover:cursor-pointer"
+                                  onClick={() => {
+                                    handleStatusChange(user._id, !user.status);
+                                    setFetchTrigger((prevState) => prevState + 1);
+                                  }}
+                                >
+                                  <span aria-hidden="true" className="absolute inset-0 bg-red-400 rounded-full opacity-50"></span>
+                                  <span className="relative">Blocked</span>
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                  {filteredUsers.length > 0 && (
                     <div className="flex flex-col items-center px-5 py-5 bg-white xs:flex-row xs:justify-between">
                       <div className="flex items-center">
                         <button
@@ -209,7 +169,7 @@ const UserList = () => {
                         </button>
                         <button
                           type="button"
-                          className="w-full px-4 py-2 text-base text-indigo-500 bg-white border-t border-b hover:bg-gray-100 "
+                          className="w-full px-4 py-2 text-base text-indigo-500 bg-white border-t border-b hover:bg-gray-100"
                         >
                           1
                         </button>
@@ -248,10 +208,10 @@ const UserList = () => {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </main>

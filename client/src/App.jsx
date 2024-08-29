@@ -35,6 +35,11 @@ import HistoryPage from "./pages/employee/HistoryPage";
 import ProfilePage from "./pages/user/ProfilePage";
 import ServiceListPage from "./pages/user/ServiceListPage";
 import ScrollToTop from "./components/common/ScrollToTop";
+import OrdersListPage from "./pages/admin/OrdersListPage";
+import OrderView from "./pages/admin/OrderView";
+import SalesReport from "./pages/admin/SalesReport";
+import EmployeeProfile from "./pages/employee/EmployeeProfile";
+import EditCategoryPage from "./pages/admin/EditCategoryPage";
 
 function App() {
   return (
@@ -66,6 +71,10 @@ function App() {
       <Route path="/admin/services" element={<ServicePage/>}/>
       <Route path="/admin/add-service" element={<ServiceAdd/>}/>
       <Route path="/admin/edit-service/:id" element={<EditService/>}/>
+      <Route path="/admin/orders" element={<OrdersListPage/>}/>
+      <Route path="/admin/order/:id" element={<OrderView/>}/>
+      <Route path="/admin/sales-report" element={<SalesReport/>}/>
+      <Route path="/admin/edit-category/:id" element={<EditCategoryPage/>}/>
       </Route>
 
       
@@ -80,6 +89,7 @@ function App() {
       <Route path="/employee/requests" element={<EmployeeRequestPage/>}/>
       <Route  path="/employee/tasks" element={<EmployeeTasks/>}/>
       <Route path="/employee/history" element = {<HistoryPage/>}/>
+      <Route path="/employee/profile" element={<EmployeeProfile/>}/>
       </Route>
       
     </Routes>

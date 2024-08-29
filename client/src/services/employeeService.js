@@ -150,3 +150,21 @@ export const fetchRecentActivities = async()=>{
         throw error.response.data;
     }
 }
+
+export const getProfileService = async()=>{
+    try {
+        const response = await axiosInstance.get("/profile");
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export const updateEmployeeProfileService = async(data)=>{
+    try {
+        const response = await axiosInstance.patch("/profile",data);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}

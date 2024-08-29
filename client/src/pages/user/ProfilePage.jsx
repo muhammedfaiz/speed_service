@@ -21,20 +21,20 @@ const UserProfile = () => {
     phone: user.phone,
   });
   const [errors, setErrors] = useState({});
-  const [stats,setStats]=useState({});
+  const [stats, setStats] = useState({});
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getProfile());
-  }, [dispatch,isEditing]);
+  }, [dispatch, isEditing]);
 
-  useEffect(()=>{
-    const fetchStats = async()=>{
-        const data = await userService.getStatsOfUser();
-        setStats(data.stats);
-    }
+  useEffect(() => {
+    const fetchStats = async () => {
+      const data = await userService.getStatsOfUser();
+      setStats(data.stats);
+    };
     fetchStats();
-  },[]);
+  }, []);
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -96,20 +96,20 @@ const UserProfile = () => {
   return (
     <>
       <Navbar />
-      <div className="max-w-3xl mx-auto my-10 bg-white shadow-xl rounded-lg p-10">
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center space-x-6">
+      <div className="max-w-3xl mx-auto my-10 bg-white shadow-xl rounded-lg p-6 sm:p-10">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-10 space-y-6 md:space-y-0">
+          <div className="flex flex-col sm:flex-row items-center space-x-6">
             <div className="relative">
               {!user.url ? (
                 <FaUserCircle className="text-gray-300 text-9xl" />
               ) : (
                 <img
-                  className="rounded-full object-contain h-48"
+                  className="rounded-full object-contain h-36 sm:h-48"
                   src={user.url}
                   alt="profile"
                 />
               )}
-              <label className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-500 transition">
+              <label className="absolute bottom-2 right-2 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-500 transition">
                 <FaCamera className="text-white" />
                 <input
                   type="file"
@@ -118,8 +118,8 @@ const UserProfile = () => {
                 />
               </label>
             </div>
-            <div>
-              <h2 className="text-4xl font-bold text-gray-800">{user?.name}</h2>
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl sm:text-4xl font-bold text-gray-800">{user?.name}</h2>
               <p className="text-gray-600">{user?.email}</p>
               <p className="text-gray-600">{user?.phone}</p>
             </div>
@@ -127,7 +127,7 @@ const UserProfile = () => {
           {isEditing ? (
             <button
               onClick={handleEditToggle}
-              className="flex items-center bg-red-600 text-white px-5 py-3 rounded-md hover:bg-red-700 transition"
+              className="flex items-center bg-red-600 text-white px-4 py-2 sm:px-5 sm:py-3 rounded-md hover:bg-red-700 transition"
             >
               <MdOutlineCancel className="mr-2 text-lg" />
               {"Cancel"}
@@ -135,7 +135,7 @@ const UserProfile = () => {
           ) : (
             <button
               onClick={handleEditToggle}
-              className="flex items-center bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 transition"
+              className="flex items-center bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-3 rounded-md hover:bg-blue-700 transition"
             >
               <FaPencilAlt className="mr-2" /> {"Edit Profile"}
             </button>
@@ -143,8 +143,8 @@ const UserProfile = () => {
         </div>
 
         {isEditing && (
-          <form onSubmit={handleFormSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form onSubmit={handleFormSubmit} className="space-y-6 sm:space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               <div>
                 <label className="block text-gray-700 font-medium">Name</label>
                 <input
@@ -152,7 +152,7 @@ const UserProfile = () => {
                   name="name"
                   value={data.name}
                   onChange={(e) => handleInputChange(e)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -165,7 +165,7 @@ const UserProfile = () => {
                   name="email"
                   value={data.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -178,7 +178,7 @@ const UserProfile = () => {
                   name="phone"
                   value={data.phone}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.phone && (
                   <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
@@ -188,7 +188,7 @@ const UserProfile = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="w-1/2 bg-primary-blue text-white px-4 py-3 rounded-lg hover:bg-secondary-blue transition"
+                className="w-full sm:w-1/2 bg-primary-blue text-white px-4 py-2 sm:py-3 rounded-lg hover:bg-secondary-blue transition"
               >
                 Save Changes
               </button>
@@ -196,18 +196,18 @@ const UserProfile = () => {
           </form>
         )}
 
-        <div className="mt-12 space-y-8">
+        <div className="mt-12 space-y-6 sm:space-y-8">
           <h3 className="text-2xl font-semibold text-gray-800">Your Stats</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-blue-50 p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            <div className="bg-blue-50 p-6 sm:p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition">
               <h4 className="text-2xl font-bold text-gray-700">{stats.booked}</h4>
               <p className="text-gray-600">Services Booked</p>
             </div>
-            <div className="bg-blue-50 p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition">
+            <div className="bg-blue-50 p-6 sm:p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition">
               <h4 className="text-2xl font-bold text-gray-700">{stats.completed}</h4>
               <p className="text-gray-600">Services Completed</p>
             </div>
-            <div className="bg-blue-50 p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition">
+            <div className="bg-blue-50 p-6 sm:p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition">
               <h4 className="text-2xl font-bold text-gray-700">{stats.pending}</h4>
               <p className="text-gray-600">Pending Service</p>
             </div>

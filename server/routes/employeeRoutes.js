@@ -1,5 +1,5 @@
 import express from 'express';
-import { acceptRequest, acceptService, application, changeTaskComplete, employeeLogin, employeeLogout, employeeRefreshToken, getBookings, getCategories, getCommitedTasks, getHistory, getRecentActivities, getServiceData, getStats, rejectService } from '../controllers/employeeController.js';
+import { acceptRequest, acceptService, application, changeTaskComplete, employeeLogin, employeeLogout, employeeRefreshToken, getBookings, getCategories, getCommitedTasks, getEmployeeProfile, getHistory, getRecentActivities, getServiceData, getStats, rejectService, updateEmployeeProfile } from '../controllers/employeeController.js';
 import upload from '../middleware/uploadMiddleware.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
@@ -23,5 +23,7 @@ router.patch("/task-complete",authMiddleware,changeTaskComplete);
 router.get("/history",authMiddleware,getHistory);
 router.get("/getStats",authMiddleware,getStats);
 router.get("/recentActivities",authMiddleware,getRecentActivities);
+router.get("/profile",authMiddleware,getEmployeeProfile);
+router.patch("/profile",authMiddleware,updateEmployeeProfile);
 
 export default router;

@@ -9,6 +9,7 @@ import {
   getCompletionRate,
   getEarnings,
   getEmployeeDetails,
+  getEmployeeProfileDetails,
   getHistoryService,
   getOrderRequests,
   getRecentActivitiesService,
@@ -16,9 +17,10 @@ import {
   getServiceHelper,
   getTaskCompleted,
   getTasksService,
+  updateEmployeeProfileService,
 } from "../services/employeeServices.js";
 import {
-    addFileToS3,
+  addFileToS3,
   generateAccessToken,
   generateRefreshToken,
   getFile,
@@ -55,7 +57,7 @@ export const application = async (req, res) => {
       experience,
       proof: fileName,
     });
-    await addFileToS3(req.file,fileName);
+    await addFileToS3(req.file, fileName);
     res.status(200).json({ message: "Application submitted" });
   } catch (error) {
     console.log(error);
@@ -78,12 +80,14 @@ export const employeeLogin = async (req, res) => {
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    res
-      .status(200)
-      .json({
-        employee: { id:employee._id, name: employee.name, email: employee.email },
-        token: accessToken,
-      });
+    res.status(200).json({
+      employee: {
+        id: employee._id,
+        name: employee.name,
+        email: employee.email,
+      },
+      token: accessToken,
+    });
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: error.message });
@@ -111,21 +115,21 @@ export const employeeLogout = async (req, res) => {
 
 export const employeeRefreshToken = async (req, res) => {
   try {
-    const {employee_refreshToken} = req.cookies;
-    if(!employee_refreshToken) {
-        return res.status(403).json({ message: "Authorization failed" });
+    const { employee_refreshToken } = req.cookies;
+    if (!employee_refreshToken) {
+      return res.status(403).json({ message: "Authorization failed" });
     }
     jwt.verify(
-        employee_refreshToken,
-        process.env.JWT_REFRESH_SECRET,
-        (err, user) => {
-          if (err) {
-            return res.status(403).json({ message: "Invalid refresh token" });
-          }
-          const newAccessToken = generateAccessToken({ id: user.id });
-          res.status(200).json({ accessToken: newAccessToken });
+      employee_refreshToken,
+      process.env.JWT_REFRESH_SECRET,
+      (err, user) => {
+        if (err) {
+          return res.status(403).json({ message: "Invalid refresh token" });
         }
-      );
+        const newAccessToken = generateAccessToken({ id: user.id });
+        res.status(200).json({ accessToken: newAccessToken });
+      }
+    );
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: error.message });
@@ -139,19 +143,19 @@ export const getServiceData = async (req, res) => {
     const { services, acceptedServices } = await getServiceHelper(id);
     let data = [];
     let accepted = [];
-    for(let service of services){
-        let obj = {...service._doc};
-        let url = await getFile(service.image);
-        obj.imageUrl = url;
-        data.push(obj);
+    for (let service of services) {
+      let obj = { ...service._doc };
+      let url = await getFile(service.image);
+      obj.imageUrl = url;
+      data.push(obj);
     }
-    for(let service of acceptedServices){
-        let obj = {...service._doc};
-        let url = await getFile(service.image);
-        obj.imageUrl = url;
-        accepted.push(obj);
+    for (let service of acceptedServices) {
+      let obj = { ...service._doc };
+      let url = await getFile(service.image);
+      obj.imageUrl = url;
+      accepted.push(obj);
     }
-    res.status(200).json({ services:data, acceptedServices:accepted });
+    res.status(200).json({ services: data, acceptedServices: accepted });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -183,88 +187,118 @@ export const rejectService = async (req, res) => {
   }
 };
 
-export const getBookings = async(req,res)=>{
+export const getBookings = async (req, res) => {
   try {
-    const {token}=req.params;
-    const decode=verifyToken(token);
+    const { token } = req.params;
+    const decode = verifyToken(token);
     const employee = await getEmployeeDetails(decode.id);
     const bookings = await getOrderRequests(employee);
-    if(bookings){
-      res.status(200).json({bookings});
+    if (bookings) {
+      res.status(200).json({ bookings });
     }
   } catch (error) {
-    res.status(400).json({message:"Bookings not found"});
+    res.status(400).json({ message: "Bookings not found" });
   }
-}
+};
 
-export const acceptRequest = async(req,res)=>{
+export const acceptRequest = async (req, res) => {
   try {
-    const {token,id}=req.body;
-    const decode=verifyToken(token);
-    const result = await acceptRequestService({employee:decode.id,orderId:id});
-    if(result){
-      res.status(200).json({message:"Request accepted successfully"});
+    const { token, id } = req.body;
+    const decode = verifyToken(token);
+    const result = await acceptRequestService({
+      employee: decode.id,
+      orderId: id,
+    });
+    if (result) {
+      res.status(200).json({ message: "Request accepted successfully" });
     }
   } catch (error) {
-    res.status(400).json({message:error.message});
+    res.status(400).json({ message: error.message });
   }
-}
+};
 
-export const getCommitedTasks = async(req,res)=>{
+export const getCommitedTasks = async (req, res) => {
   try {
     const employeeId = req.user.id;
     const data = await getTasksService(employeeId);
-    if(data){
-      res.status(200).json({tasks:data});
+    if (data) {
+      res.status(200).json({ tasks: data });
     }
   } catch (error) {
-    res.status(404).json({message:error.message});
+    res.status(404).json({ message: error.message });
   }
-}
+};
 
-
-export const changeTaskComplete = async(req,res)=>{
+export const changeTaskComplete = async (req, res) => {
   try {
-    const {id}=req.body;
+    const { id } = req.body;
     const result = await changeTaskCompleteService(id);
-    if(result){
-      res.status(200).json({message:"Order completed successfully"});
+    if (result) {
+      res.status(200).json({ message: "Order completed successfully" });
     }
   } catch (error) {
-    res.status(400).json({message:"Failed to change status"});
+    res.status(400).json({ message: "Failed to change status" });
   }
-}
+};
 
-export const getHistory = async(req,res)=>{
+export const getHistory = async (req, res) => {
   try {
     const history = await getHistoryService(req.user.id);
-    res.status(200).json({history});
+    res.status(200).json({ history });
   } catch (error) {
-    res.status(404).json({message:"Failed to get history"});
+    res.status(404).json({ message: "Failed to get history" });
   }
-}
+};
 
-export const getStats = async(req,res)=>{
+export const getStats = async (req, res) => {
   try {
     const id = req.user.id;
     const completed = await getTaskCompleted(id);
     const pendingRequest = await getRequestsCount(id);
     const earnings = await getEarnings(id);
     const completionRate = await getCompletionRate(id);
-    res.status(200).json({completed,pendingRequest,earnings,completionRate});
+    res
+      .status(200)
+      .json({ completed, pendingRequest, earnings, completionRate });
   } catch (error) {
-    res.status(404).json({message:"Failed to get stats"});
+    res.status(404).json({ message: "Failed to get stats" });
   }
-}
+};
 
-export const getRecentActivities = async(req,res)=>{
+export const getRecentActivities = async (req, res) => {
   try {
     const id = req.user.id;
     const activities = await getRecentActivitiesService(id);
-    if(activities){
-      res.status(200).json({activities});
+    if (activities) {
+      res.status(200).json({ activities });
     }
   } catch (error) {
-    res.stats(404).json({message:"Failed to get recent activities"});
+    res.stats(404).json({ message: "Failed to get recent activities" });
   }
-}
+};
+
+export const getEmployeeProfile = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const employee = await getEmployeeProfileDetails(id);
+    res
+      .status(200)
+      .json({ ...employee._doc, designation: employee.designation.name });
+  } catch (error) {
+    res.status(400).json({ message: "Failed to get employee profile" });
+  }
+};
+
+export const updateEmployeeProfile = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const update = await updateEmployeeProfileService(id, req.body);
+    const employee = await getEmployeeProfileDetails(id);
+    res
+      .status(200)
+      .json({ ...employee._doc, designation: employee.designation.name });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "Failed to update employee profile" });
+  }
+};

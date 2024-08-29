@@ -6,16 +6,21 @@ import {
   createAdmin,
   deleteCategoryService,
   deleteServiceHelper,
+  fetchOrderService,
   getAdminByEmail,
   getAllCategoriesService,
+  getAllOrdersService,
   getApplicationByIdAndDelete,
   getApplicationService,
   getCategory,
+  getCategoryDetailsService,
   getEmployeeService,
+  getSalesDataService,
   getServicesData,
   getUsers,
   serviceData,
   setEmployee,
+  updateCategoryDetailsService,
   updateServiceHelper,
   userChangeStatus,
 } from "../services/adminService.js";
@@ -171,7 +176,7 @@ export const addCategory = async (req, res) => {
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await getAllCategoriesService();
-    for(let category of categories){
+    for (let category of categories) {
       const url = await getFile(category.image);
       category.imageUrl = url;
     }
@@ -185,7 +190,7 @@ export const deleteCategory = async (req, res) => {
   try {
     const category = await getCategory(req.params.id);
     if (!category) {
-      res.status(404).json({message:"Category not found"});
+      res.status(404).json({ message: "Category not found" });
     }
     await removeFile(category.image);
     const response = await deleteCategoryService(category._id);
@@ -201,9 +206,9 @@ export const deleteCategory = async (req, res) => {
 export const getApplications = async (req, res) => {
   try {
     const data = await getApplicationService();
-    const applications=[];
-    for(let application of data){
-      const obj = {...application._doc};
+    const applications = [];
+    for (let application of data) {
+      const obj = { ...application._doc };
       const url = await getFile(application.proof);
       obj.proofUrl = url;
       applications.push(obj);
@@ -289,7 +294,7 @@ export const changeEmployeeStatus = async (req, res) => {
 export const addNewService = async (req, res) => {
   try {
     const { name, price, category, description } = req.body;
-    if(!req.file){
+    if (!req.file) {
       throw "Image required";
     }
     const fileName = randomName(req.file);
@@ -316,8 +321,8 @@ export const getServices = async (req, res) => {
   try {
     const data = await getServicesData();
     const services = [];
-    for(let service of data){
-      const obj = {...service._doc};
+    for (let service of data) {
+      const obj = { ...service._doc };
       const url = await getFile(service.image);
       obj.imageUrl = url;
       services.push(obj);
@@ -345,7 +350,7 @@ export const getServiceData = async (req, res) => {
   try {
     const data = await serviceData(req.params.id);
     const url = await getFile(data.image);
-    const service = {...data._doc};
+    const service = { ...data._doc };
     service.imageUrl = url;
     res.status(200).json({ service });
   } catch (error) {
@@ -358,7 +363,7 @@ export const updateServiceData = async (req, res) => {
     const { id } = req.params;
     const { name, price, category, description } = req.body;
     let fileName;
-    if(req.file){
+    if (req.file) {
       fileName = randomName(req.file);
       await addFileToS3(req.file, fileName);
     }
@@ -368,7 +373,7 @@ export const updateServiceData = async (req, res) => {
       category,
       description,
     };
-    if(fileName){
+    if (fileName) {
       data.image = fileName;
     }
     const result = await updateServiceHelper(id, data);
@@ -380,3 +385,134 @@ export const updateServiceData = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getOrdersService = async (req, res) => {
+  try {
+    const orders = await getAllOrdersService();
+    res.status(200).json({ orders });
+  } catch (error) {
+    res.status(400).json({ message: "Couldn't get orders" });
+  }
+};
+
+export const fetchOrderDetails = async (req, res) => {
+  try {
+    const data = await fetchOrderService(req.params.id);
+    const order = JSON.parse(JSON.stringify(data));
+    for (let item of order.orderItems) {
+      const url = await getFile(item.item.image);
+      item.item.imageUrl = url;
+    }
+    res.status(200).json({ order });
+  } catch (error) {
+    res.status(400).json({ message: "Failed to fetch order details" });
+  }
+};
+
+export const getSalesData = async (req, res) => {
+  try {
+    const orders = await getSalesDataService();
+    let totalRevenue = 0;
+    let totalSales = 0;
+    const totalOrders = orders.length;
+    const salesPerDay = [];
+
+    orders.forEach((order) => {
+      totalRevenue += order.totalAmount;
+
+      if (order.status === "Completed") {
+        totalSales++;
+      }
+      const day = new Date(order.createdAt).toISOString().split("T")[0];
+      const existingData = salesPerDay.find((data) => data.day == day);
+      if (existingData) {
+        existingData.totalSales += order.status === "Completed" ? 1 : 0;
+        existingData.totalOrders += 1;
+        existingData.totalRevenue += order.totalAmount;
+      } else {
+        salesPerDay.push({
+          day,
+          totalSales: order.status === "Completed" ? 1 : 0,
+          totalOrders: 1,
+          totalRevenue: order.totalAmount,
+        });
+      }
+    });
+
+    const salesData = {
+      totalRevenue,
+      totalSales,
+      totalOrders,
+      salesPerDay,
+    };
+    res.status(200).json({ salesData });
+  } catch (error) {
+    res.status(404).json({ message: "Failed to get sales data" });
+  }
+};
+
+export const getDashboard = async(req,res)=>{
+  try {
+    const orders = await getSalesDataService();
+    const totalOrders = orders.length;
+    let totalSales = 0;
+    let totalRevenue = 0;
+    const sales = [];
+    const orderData = [];
+    orders.forEach((item) => {
+      const day = new Date(item.createdAt).toLocaleDateString();
+      if(item.status==="Completed") {
+        totalSales++;
+        totalRevenue += item.totalAmount;
+      }
+      const existingSalesData = sales.find((data) => data.day === day);
+      const existingOrderData = orderData.find((data) => data.day === day);
+      if(existingSalesData) {
+        existingSalesData.revenue += 1;
+      } else {
+        sales.push({day,revenue:1})
+      }
+      if(existingOrderData){
+        existingOrderData.count += 1;
+      }else{
+        orderData.push({day,count:1});
+      }
+    });
+   res.status(200).json({totalSales,totalRevenue,totalOrders,sales,orders:orderData})
+  } catch (error) {
+    res.status(400).json({message:"Failed to fetch details"})
+  }
+}
+
+export const getCategoryDetails = async(req,res)=>{
+  try {
+    const data = await getCategoryDetailsService(req.params.id);
+    const category = JSON.parse(JSON.stringify(data));
+    if(data){
+      const url = await getFile(category.image);
+      category.image = url;
+    }
+    res.status(200).json({category});
+  } catch (error) {
+    res.status(404).json({message:"Failed to fetch details"});
+  }
+}
+
+export const updateCategoryDetails = async(req,res)=>{
+  try {
+    const {id}=req.params;
+    const {name}=req.body;
+    let fileName;
+    if(req.file){
+      fileName = randomName(req.file);
+      await addFileToS3(req.file,fileName);
+    }
+    const result = await updateCategoryDetailsService(id, {name,image:fileName});
+    if(fileName && result.image){
+      await removeFile(result.image);
+    }
+    res.status(200).json({message:"Category details updated successfully"});
+  } catch (error) {
+    res.status(400).json({message:"Failed to update details"});
+  }
+}
