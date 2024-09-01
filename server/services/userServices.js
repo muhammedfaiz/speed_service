@@ -6,6 +6,7 @@ import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Review from "../models/Review.js";
 import Category from "../models/Category.js";
+import Employee from "../models/Employee.js"
 
 export const createUser = async ({ name, email, password, phone, otp }) => {
   try {
@@ -307,3 +308,12 @@ export const getRating = async (id) => {
     throw new Error("Failed to get rating of user");
   }
 };
+
+export const getEmployeeByDesignation = async(designation)=>{
+  try {
+    const employee = await Employee.find({designation: designation});
+    return employee;
+  } catch (error) {
+    throw new Error("Failed to get employee by designation");
+  }
+}

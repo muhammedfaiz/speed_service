@@ -149,6 +149,7 @@ const Checkout = () => {
     }
   };
 
+
   const successHandler = async (paymentResult) => {
     console.log("Payment success!", paymentResult);
     if (paymentResult) {

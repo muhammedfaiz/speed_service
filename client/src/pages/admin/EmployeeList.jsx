@@ -64,7 +64,7 @@ const EmployeeList = () => {
           <h1 className="text-3xl font-bold">Employee</h1>
           <p className="text-gray-600">Manage employee.</p>
         </div>
-        <div className="container max-w-3xl px-4 mx-auto sm:px-8">
+        <div className="container max-w-3xl mx-auto lg:px-0">
           <div className="py-8">
             <div className="flex space-x-2 justify-end">
               <div className="flex">
@@ -91,7 +91,7 @@ const EmployeeList = () => {
                   </div>
                 ) : (
                   <>
-                    <table className="min-w-full leading-normal">
+                    <table className="min-w-full">
                       <thead>
                         <tr>
                           <th

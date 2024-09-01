@@ -19,6 +19,7 @@ import {
   getTasksService,
   updateEmployeeProfileService,
 } from "../services/employeeServices.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 import {
   addFileToS3,
   generateAccessToken,
@@ -210,6 +211,11 @@ export const acceptRequest = async (req, res) => {
       orderId: id,
     });
     if (result) {
+      const socketId = getReceiverSocketId(result.user);
+      if(socketId){
+        const message = "Your service provider has been fixed for the booking #" + result.orderId;
+        io.to(socketId).emit("user_notification",{message});
+      }
       res.status(200).json({ message: "Request accepted successfully" });
     }
   } catch (error) {
@@ -234,6 +240,11 @@ export const changeTaskComplete = async (req, res) => {
     const { id } = req.body;
     const result = await changeTaskCompleteService(id);
     if (result) {
+      const socketId = getReceiverSocketId(result.user);
+      if(socketId){
+        const message = "Your service has been completed for the booking #" + result.orderId;
+        io.to(socketId).emit("user_notification",{message});
+      }
       res.status(200).json({ message: "Order completed successfully" });
     }
   } catch (error) {

@@ -17,6 +17,10 @@ export const getReceiverSocketId=(receiverId)=>{
     return userSocketMap[receiverId];
 }
 
+const removeUserSocket = (id)=>{
+    delete userSocketMap[id];
+}
+
 const userSocketMap = {};
 
 io.on('connection', (socket)=>{
@@ -26,6 +30,11 @@ io.on('connection', (socket)=>{
     if(userId!=undefined) userSocketMap[userId]=socket.id;
     if(employeeId!=undefined) userSocketMap[employeeId]=socket.id;
     socket.on('disconnect', ()=>{
+        if(userSocketMap[userId]==socket.id){
+            removeUserSocket(userId);
+        }else{
+            removeUserSocket(employeeId);
+        }
         console.log('a user disconnected',socket.id);
     });
 });

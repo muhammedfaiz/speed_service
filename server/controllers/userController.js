@@ -13,6 +13,7 @@ import {
   getBookingsHelper,
   getCartDetailsUser,
   getCartHelper,
+  getEmployeeByDesignation,
   getRating,
   getReviewData,
   getServiceHelper,
@@ -39,6 +40,7 @@ import {
   verifyToken,
 } from "../utils/utils.js";
 import jwt from "jsonwebtoken";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 const userRegister = async (req, res) => {
   try {
@@ -347,6 +349,10 @@ const updateQuantityCart = async (req, res) => {
         cart.items = cart.items.filter((item) => item.item._id != itemId);
       }
       await cart.save();
+      if(cart.items.length==0){
+        await clearCart(cart._id);
+        return res.status(200).json({ message: "Cart deleted successfully" });
+      }
     }
     res.status(200).json({ message: "Quantity updated successfully" });
   } catch (error) {
@@ -380,6 +386,16 @@ const placeOrder = async (req, res) => {
       const order = await placeOrderHelper(details);
       if (order) {
         await clearCart(data.cart._id);
+        const employees = await getEmployeeByDesignation(data.cart.category);
+        for (let employee of employees) {
+          const message = `New order has been placed for your service. Order ID: ${order.orderId}`;
+          const socketId = getReceiverSocketId(employee._id);
+          if(socketId){
+            io.to(socketId).emit("employee_notification",{
+              message
+            });
+          }
+        }
         res.status(200).json({ message: "Order placed successfully" });
       }
     }
