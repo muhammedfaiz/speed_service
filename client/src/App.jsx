@@ -8,7 +8,6 @@ import AdminAuth from "./components/admin/AdminAuth";
 import Dashboard from "./pages/admin/Dashboard";
 import UserList from "./pages/admin/UserList";
 import ApplicationPage from "./pages/employee/ApplicationPage";
-// import SplashScreen from "./components/user/SplashScreen";
 import Category from "./pages/admin/Category";
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
