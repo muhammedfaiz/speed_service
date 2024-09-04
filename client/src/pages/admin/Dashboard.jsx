@@ -3,15 +3,14 @@ import logo from "../../assets/logo-transparent.png";
 import Navbar from "../../components/admin/Navbar";
 import ProfileDropdown from "../../components/admin/ProfileDropdown";
 import { Line } from "react-chartjs-2";
-import {
-  getDashboardDataService,
-  getOrdersService,
-} from "../../services/adminService";
+import { getDashboardDataService, getOrdersService } from "../../services/adminService";
 import "chart.js/auto";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({});
   const [orders, setOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage] = useState(5); // Set rows per page to a fixed value
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -28,6 +27,13 @@ const Dashboard = () => {
     };
     fetchRecentOrders();
   }, []);
+
+  // Pagination logic
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentOrders = orders.slice(indexOfFirstRow, indexOfLastRow);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const salesData = {
     labels: dashboardData?.sales?.map((sale) => sale.day),
@@ -71,51 +77,34 @@ const Dashboard = () => {
         {/* KPIs Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-10">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Total Revenue
-            </h3>
-            <p className="text-2xl font-bold text-green-500">
-              ${dashboardData?.totalRevenue}
-            </p>
+            <h3 className="text-lg font-semibold text-gray-700">Total Revenue</h3>
+            <p className="text-2xl font-bold text-green-500">${dashboardData?.totalRevenue}</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-700">Total Sales</h3>
-            <p className="text-2xl font-bold text-blue-500">
-              {dashboardData?.totalSales}
-            </p>
+            <p className="text-2xl font-bold text-blue-500">{dashboardData?.totalSales}</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Total Orders
-            </h3>
-            <p className="text-2xl font-bold text-purple-500">
-              {dashboardData?.totalOrders}
-            </p>
+            <h3 className="text-lg font-semibold text-gray-700">Total Orders</h3>
+            <p className="text-2xl font-bold text-purple-500">{dashboardData?.totalOrders}</p>
           </div>
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
-              Sales Revenue
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Sales Revenue</h3>
             <Line data={salesData} />
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
-              Total Orders
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Total Orders</h3>
             <Line data={ordersData} />
           </div>
         </div>
 
         {/* Recent Orders Section */}
-        {/* Recent Orders Section */}
         <div className="bg-white p-6 rounded-lg shadow-md mt-10">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">
-            Recent Orders
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Recent Orders</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white">
               <thead>
@@ -138,22 +127,14 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders?.map((order, index) => (
+                {currentOrders.map((order, index) => (
                   <tr key={index}>
+                    <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">{order.orderId}</td>
+                    <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">{order.user.name}</td>
                     <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">
-                      {order.orderId}
+                      {order.orderItems.map((item) => item.item.name).join(", ")}
                     </td>
-                    <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">
-                      {order.user.name}
-                    </td>
-                    <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">
-                      {order.orderItems
-                        .map((item) => item.item.name)
-                        .join(", ")}
-                    </td>
-                    <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">
-                      {order.status}
-                    </td>
+                    <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">{order.status}</td>
                     <td className="px-4 py-2 border-b border-gray-200 text-sm text-gray-700">
                       {new Date(order.createdAt).toDateString()}
                     </td>
@@ -161,6 +142,24 @@ const Dashboard = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-end mt-4">
+            <nav>
+              <ul className="flex space-x-2">
+                {Array.from({ length: Math.ceil(orders.length / rowsPerPage) }, (_, index) => (
+                  <li key={index}>
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className={`px-3 py-1 rounded-lg ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </div>
       </main>

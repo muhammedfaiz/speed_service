@@ -7,4 +7,4 @@ const EmployeeAuth = () => {
     employee && token ? <Outlet/>:<Navigate to="/employee/login"/>
   )
 }
-export default EmployeeAuth
+export default EmployeeAuth;

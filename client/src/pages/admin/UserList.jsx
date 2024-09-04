@@ -10,6 +10,8 @@ const UserList = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [fetchTrigger, setFetchTrigger] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Number of users per page
 
   useEffect(() => {
     const getUsers = async () => {
@@ -34,6 +36,7 @@ const UserList = () => {
       );
       setFilteredUsers(users);
     }
+    setCurrentPage(1); // Reset to first page after search
   };
 
   const handleStatusChange = async (userId, status) => {
@@ -44,6 +47,18 @@ const UserList = () => {
     } catch (error) {
       toast.error(error.message);
     }
+  };
+
+  // Pagination logic
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -97,14 +112,14 @@ const UserList = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredUsers.length === 0 ? (
+                      {currentUsers.length === 0 ? (
                         <tr>
                           <td colSpan="5" className="px-5 py-5 text-sm bg-white border-b border-gray-200 text-center">
                             No users found
                           </td>
                         </tr>
                       ) : (
-                        filteredUsers.map((user) => (
+                        currentUsers.map((user) => (
                           <tr key={user._id}>
                             <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                               <div className="flex items-center">
@@ -150,63 +165,18 @@ const UserList = () => {
                     </tbody>
                   </table>
                   {filteredUsers.length > 0 && (
-                    <div className="flex flex-col items-center px-5 py-5 bg-white xs:flex-row xs:justify-between">
-                      <div className="flex items-center">
+                    <div className="flex justify-center items-center px-5 py-5 bg-white">
+                      
+                      {Array.from({ length: totalPages }, (_, index) => (
                         <button
-                          type="button"
-                          className="w-full p-4 text-base text-gray-600 bg-white border rounded-l-xl hover:bg-gray-100"
+                          key={index + 1}
+                          onClick={() => goToPage(index + 1)}
+                          className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-blue-600 text-white" : "bg-gray-300"}`}
                         >
-                          <svg
-                            width="9"
-                            fill="currentColor"
-                            height="8"
-                            className=""
-                            viewBox="0 0 1792 1792"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M1427 301l-531 531 531 531q19 19 19 45t-19 45l-166 166q-19 19-45 19t-45-19l-742-742q-19-19-19-45t19-45l742-742q19-19 45-19t45 19l166 166q19 19 19 45t-19 45z"></path>
-                          </svg>
+                          {index + 1}
                         </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-indigo-500 bg-white border-t border-b hover:bg-gray-100"
-                        >
-                          1
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100"
-                        >
-                          2
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-gray-600 bg-white border-t border-b hover:bg-gray-100"
-                        >
-                          3
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100"
-                        >
-                          4
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full p-4 text-base text-gray-600 bg-white border-t border-b border-r rounded-r-xl hover:bg-gray-100"
-                        >
-                          <svg
-                            width="9"
-                            fill="currentColor"
-                            height="8"
-                            className=""
-                            viewBox="0 0 1792 1792"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"></path>
-                          </svg>
-                        </button>
-                      </div>
+                      ))}
+                      
                     </div>
                   )}
                 </div>

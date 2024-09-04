@@ -71,10 +71,34 @@ export const sendEmployeeCode=async(data)=>{
     }
     try{
         await transporter.sendMail(mailOptions);
-        console.log('Employee code sent successfully');
         return;
     }catch(error){
-        console.log(error);
+        throw new Error('Error sending employee code ',error.message);
+    }
+}
+
+export const sendResetPassword = async(data)=>{
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_PASSWORD,
+        },
+    })
+    const mailOptions = {
+        from:process.env.GMAIL_USER,
+        to:data.email,
+        subject: 'Speed Service reset password',
+        text: `Your reset password link is ${data.link}.
+        This link will be expired within 15 minutes, quickly reset your password.`,
+    }
+    try{
+        await transporter.sendMail(mailOptions);
+        return;
+    }catch(error){
         throw new Error('Error sending employee code ',error.message);
     }
 }
@@ -177,4 +201,30 @@ export const refundPayment = async (captureId)=>{
     request.requestBody({});
     const response = await paypalClient.execute(request);
     return response;
+}
+
+export const oneTimeLink = async(user)=>{
+    const secret = process.env.JWT_SECRET+user.password;
+    const  payload = {
+        email:user.email,
+        id:user._id
+    }
+    const token = jwt.sign(payload, secret, { expiresIn: '15m' });
+    const link = `http://localhost:5173/reset-password/${user._id}/${token}`;
+    return link;
+}
+
+export const verifyOneTimeLink = async(token,user)=>{
+    const secret = process.env.JWT_SECRET+user.password;
+    try {
+        const payload = jwt.verify(token,secret);
+        if(payload.id === user._id){
+            return true;
+        }else{
+            return false;
+        }
+    } catch (error) {
+        throw new Error("Verification failed");
+    }
+    
 }

@@ -13,6 +13,8 @@ const EmployeeList = () => {
   const [filteredEmployee, setFilteredEmployee] = useState([]);
   const [employee, setEmployee] = useState([]);
   const [isChanged, setIsChanged] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [employeesPerPage] = useState(5); // Change the number to set employees per page
 
   useEffect(() => {
     async function getEmployee() {
@@ -36,6 +38,7 @@ const EmployeeList = () => {
       item.name.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredEmployee(result);
+    setCurrentPage(1); // Reset to the first page after searching
   }
 
   async function handleStatus(id, status) {
@@ -47,6 +50,19 @@ const EmployeeList = () => {
       toast.error(error.message);
     }
   }
+
+  // Pagination Logic
+  const indexOfLastEmployee = currentPage * employeesPerPage;
+  const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
+  const currentEmployees = filteredEmployee.slice(
+    indexOfFirstEmployee,
+    indexOfLastEmployee
+  );
+  const totalPages = Math.ceil(filteredEmployee.length / employeesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
@@ -85,7 +101,7 @@ const EmployeeList = () => {
             </div>
             <div className="px-2 py-4 -mx-4 sm:-mx-8 sm:px-8">
               <div className="inline-block min-w-full overflow-hidden rounded-lg shadow">
-                {filteredEmployee.length === 0 ? (
+                {currentEmployees.length === 0 ? (
                   <div className="text-center py-4 text-gray-600">
                     <p>No employees found.</p>
                   </div>
@@ -139,7 +155,7 @@ const EmployeeList = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredEmployee.map((item) => {
+                        {currentEmployees.map((item) => {
                           return (
                             <tr key={item.id}>
                               <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
@@ -177,7 +193,9 @@ const EmployeeList = () => {
                               <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                                 {item.status === "active" ? (
                                   <span
-                                    onClick={() => handleStatus(item.id, "blocked")}
+                                    onClick={() =>
+                                      handleStatus(item.id, "blocked")
+                                    }
                                     className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer"
                                   >
                                     <span
@@ -188,7 +206,9 @@ const EmployeeList = () => {
                                   </span>
                                 ) : (
                                   <span
-                                    onClick={() => handleStatus(item.id, "active")}
+                                    onClick={() =>
+                                      handleStatus(item.id, "active")
+                                    }
                                     className="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900 hover:cursor-pointer"
                                   >
                                     <span
@@ -204,64 +224,26 @@ const EmployeeList = () => {
                         })}
                       </tbody>
                     </table>
-                    <div className="flex flex-col items-center px-5 py-5 bg-white xs:flex-row xs:justify-between">
-                      <div className="flex items-center">
-                        <button
-                          type="button"
-                          className="w-full p-4 text-base text-gray-600 bg-white border rounded-l-xl hover:bg-gray-100"
-                        >
-                          <svg
-                            width="9"
-                            fill="currentColor"
-                            height="8"
-                            className=""
-                            viewBox="0 0 1792 1792"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M1427 301l-531 531 531 531q19 19 19 45t-19 45l-166 166q-19 19-45 19t-45-19l-742-742q-19-19-19-45t19-45l742-742q19-19 45-19t45 19l166 166q19 19 19 45t-19 45z"></path>
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-indigo-500 bg-white border-t border-b hover:bg-gray-100"
-                        >
-                          1
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100"
-                        >
-                          2
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-gray-600 bg-white border-t border-b hover:bg-gray-100"
-                        >
-                          3
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100"
-                        >
-                          4
-                        </button>
-                        <button
-                          type="button"
-                          className="w-full p-4 text-base text-gray-600 bg-white border-t border-b border-r rounded-r-xl hover:bg-gray-100"
-                        >
-                          <svg
-                            width="9"
-                            fill="currentColor"
-                            height="8"
-                            className=""
-                            viewBox="0 0 1792 1792"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
+
+                    {/* Pagination */}
+                    <nav className="flex justify-center my-4">
+                      <ul className="flex space-x-2">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                          <li key={index}>
+                            <button
+                              onClick={() => handlePageChange(index + 1)}
+                              className={`px-4 py-2 border border-gray-300 rounded-md ${
+                                currentPage === index + 1
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-white text-gray-700"
+                              }`}
+                            >
+                              {index + 1}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
                   </>
                 )}
               </div>

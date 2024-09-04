@@ -6,7 +6,7 @@ const initialState = {
     isLoggedIn: false,
     employee: localStorage.getItem("employee")||null,
     error: null,
-    token:null,
+    token:localStorage.getItem("employee_access_token")|| null,
 }
 
 export const login = createAsyncThunk("employee/login",async(data,thunkApi)=>{
@@ -75,7 +75,6 @@ export const employeeSlice = createSlice({
             state.employee = action.payload;
         })
         .addCase(updateEmployeeProfile.fulfilled,(state,action)=>{
-            console.log(action.payload);
             state.employee = action.payload;
         })
     }

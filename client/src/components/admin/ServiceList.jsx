@@ -8,6 +8,8 @@ const ServiceList = () => {
   const [filteredServices, setFilteredServices] = useState([]);
   const [search, setSearch] = useState("");
   const [change, setChange] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(3); // Set how many items you want to display per page
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,11 +26,13 @@ const ServiceList = () => {
   }, [change]);
 
   const handleSearchChange = () => {
-    const filteredServices = services.filter(service =>
-      service.name.toLowerCase().includes(search.toLowerCase()) ||
-      service.category.name.toLowerCase().includes(search.toLowerCase())
+    const filteredServices = services.filter(
+      (service) =>
+        service.name.toLowerCase().includes(search.toLowerCase()) ||
+        service.category.name.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredServices(filteredServices);
+    setCurrentPage(1); // Reset to page 1 after search
   };
 
   const handleDelete = async (id) => {
@@ -42,6 +46,18 @@ const ServiceList = () => {
       toast.error(error.message);
     }
   };
+
+  // Calculate the current services to display
+  const indexOfLastService = currentPage * itemsPerPage;
+  const indexOfFirstService = indexOfLastService - itemsPerPage;
+  const currentServices = filteredServices.slice(
+    indexOfFirstService,
+    indexOfLastService
+  );
+
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="container max-w-3xl px-4 mx-auto sm:px-8">
@@ -69,7 +85,7 @@ const ServiceList = () => {
         </div>
         <div className="px-4 py-4 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
           <div className="inline-block min-w-full overflow-hidden rounded-lg shadow">
-            {filteredServices.length === 0 ? (
+            {currentServices.length === 0 ? (
               <div className="px-6 py-4 text-center text-gray-600">
                 No services found
               </div>
@@ -112,7 +128,7 @@ const ServiceList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredServices.map((service) => (
+                  {currentServices.map((service) => (
                     <tr key={service._id}>
                       <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                         <div className="flex items-center">
@@ -157,7 +173,9 @@ const ServiceList = () => {
                       </td>
                       <td className="px-5 py-5 text-sm bg-white border-b border-gray-200">
                         <a
-                          onClick={() => { handleDelete(service._id); }}
+                          onClick={() => {
+                            handleDelete(service._id);
+                          }}
                           className="text-red-600 hover:text-red-900 cursor-pointer"
                         >
                           Delete
@@ -168,63 +186,20 @@ const ServiceList = () => {
                 </tbody>
               </table>
             )}
-            <div className="flex flex-col items-center px-5 py-5 bg-white xs:flex-row xs:justify-between">
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  className="w-full p-4 text-base text-gray-600 bg-white border rounded-l-xl hover:bg-gray-100"
-                >
-                  <svg
-                    width="9"
-                    fill="currentColor"
-                    height="8"
-                    className=""
-                    viewBox="0 0 1792 1792"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M1427 301l-531 531 531 531q19 19 19 45t-19 45l-166 166q-19 19-45 19t-45-19l-742-742q-19-19-19-45t19-45l742-742q19-19 45-19t45 19l166 166q19 19 19 45t-19 45z"></path>
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-base text-indigo-500 bg-white border-t border-b hover:bg-gray-100"
-                >
-                  1
-                </button>
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100"
-                >
-                  2
-                </button>
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-base text-gray-600 bg-white border-t border-b hover:bg-gray-100"
-                >
-                  3
-                </button>
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100"
-                >
-                  4
-                </button>
-                <button
-                  type="button"
-                  className="w-full p-4 text-base text-gray-600 bg-white border-t border-b border-r rounded-r-xl hover:bg-gray-100"
-                >
-                  <svg
-                    width="9"
-                    fill="currentColor"
-                    height="8"
-                    className=""
-                    viewBox="0 0 1792 1792"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"></path>
-                  </svg>
-                </button>
-              </div>
+            <div className="flex justify-center items-center px-5 py-5 bg-white">
+            {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => paginate(i + 1)}
+              className={`mx-1 px-3 py-1 rounded ${
+                currentPage === i + 1
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-800"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
             </div>
           </div>
         </div>

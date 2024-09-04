@@ -4,12 +4,15 @@ import { Link } from "react-router-dom";
 
 const ServicesHome = () => {
   const [services, setServices] = useState([]);
-  
+
   useEffect(() => {
     const getServices = async () => {
       const data = await userService.fetchServices();
-      setServices(data.services);
+      const sortedServices = data.services.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const maxServicesToShow = 3 * 4; 
+      setServices(sortedServices.slice(0, maxServicesToShow));
     };
+
     getServices();
   }, []);
 

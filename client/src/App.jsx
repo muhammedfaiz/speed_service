@@ -40,6 +40,9 @@ import OrderView from "./pages/admin/OrderView";
 import SalesReport from "./pages/admin/SalesReport";
 import EmployeeProfile from "./pages/employee/EmployeeProfile";
 import EditCategoryPage from "./pages/admin/EditCategoryPage";
+import UserAuth from "./components/user/UserAuth";
+import ForgotPassword from "./pages/user/ForgotPassword";
+import ResetPasswordPage from "./pages/user/ResetPasswordPage";
 
 function App() {
   return (
@@ -49,15 +52,19 @@ function App() {
       {/* User Routes */}
       <Route path="/signup" element={<RegisterationPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element = {<ForgotPassword/>}/>
+      <Route path="/reset-password/:id/:token" element={<ResetPasswordPage />}/>
       <Route path="/" element={<HomePage/>}/>
       <Route path="/services" element={<ServiceListPage/>}/>
       <Route path="/service/:id" element={<ServiceBookingPage/>}/>
+      <Route element={<UserAuth/>}>
       <Route path="/cart" element={<CartPage/>}/>
       <Route path="/checkout/:id" element={<Checkout/>}/>
       <Route path="/success" element={<SuccessOrderPage/>}/>
       <Route path="/bookings" element={<BookingsPage/>}/>
       <Route path="/booking-details/:id" element={<BookingDetailsPage/>}/>
       <Route path="/profile" element={<ProfilePage/>}/>
+      </Route>
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLoginPage />} />

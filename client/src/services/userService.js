@@ -274,6 +274,25 @@ export const getCheckout = async(id)=>{
   }
  }
 
+ const forgotPasswordService = async(data)=>{
+  try {
+    const response = await axiosInstance.post('/forgot-password',data);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+ }
+
+ const ResetPassword = async(data)=>{
+  try {
+    const response = await axiosInstance.post('/reset-password',data);
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error.response.data;
+  }
+ }
+
 const userService = {
   register,
   login,
@@ -300,5 +319,7 @@ const userService = {
   changeProfileImageService,
   updateProfileDetailsService,
   getStatsOfUser,
+  forgotPasswordService,
+  ResetPassword
 };
 export default userService;

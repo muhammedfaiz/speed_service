@@ -4,11 +4,14 @@ import Footer from "../../components/user/Footer";
 import Navbar from "../../components/user/Navbar";
 import userService from "../../services/userService";
 
+const ITEMS_PER_PAGE = 8; // Adjust the number of items per page
+
 const ServiceListPage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const location = useLocation();
 
   useEffect(() => {
@@ -50,6 +53,19 @@ const ServiceListPage = () => {
     setFilteredServices(filtered);
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredServices.length / ITEMS_PER_PAGE);
+  const currentServices = filteredServices.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -82,8 +98,8 @@ const ServiceListPage = () => {
         </div>
         
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {filteredServices.map((service) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          {currentServices.map((service) => (
             <Link
               key={service._id}
               to={`/service/${service._id}`}
@@ -114,6 +130,25 @@ const ServiceListPage = () => {
               </div>
             </Link>
           ))}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center mb-8">
+          
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                index + 1 === currentPage
+                  ? "bg-black text-white"
+                  : "bg-gray-300 text-gray-700"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          
         </div>
       </div>
       <Footer />

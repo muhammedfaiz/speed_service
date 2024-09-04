@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../features/userSlice";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +29,8 @@ const Login = () => {
     return errors;
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
       const validationError=validation();
       if(Object.keys(validationError).length>0){
         setErrors(validationError);
@@ -38,6 +40,12 @@ const Login = () => {
         dispatch(login({email,password}));
       }
   };
+
+  useEffect(()=>{
+    if(error){
+        toast.error(error.message);
+    }
+  },[error]);
 
   useEffect(()=>{
     if(isSuccess){
@@ -50,7 +58,6 @@ const Login = () => {
         Login To Your Account
       </div>
       <div className="mt-8">
-      {error && <p className="text-red-500 text-base mb-2">{error.message}</p>}
         <div className="flex flex-col mb-2">
             {errors.email && <p className="text-red-500 text-xs mb-1">{errors.email}</p>}
           <div className="flex relative ">
@@ -78,7 +85,7 @@ const Login = () => {
         <div className="flex items-center mb-6 -mt-4">
           <div className="flex ml-auto">
             <Link
-              to="/forget-password"
+              to="/forgot-password"
               className="inline-flex text-xs font-thin text-gray-500 sm:text-sm dark:text-gray-100 hover:text-gray-700 dark:hover:text-white"
             >
               Forgot Your Password?
@@ -88,7 +95,7 @@ const Login = () => {
         <div className="flex w-full">
           <button
             type="submit"
-            onClick={() => handleSubmit()}
+            onClick={(e) => handleSubmit(e)}
             className="py-2 px-4  bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-purple-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg "
           >
             Login

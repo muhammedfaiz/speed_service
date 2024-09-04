@@ -1,5 +1,5 @@
 import express from 'express';
-import { userRegister,userLogin, verifyOtp, resendOtp, userLogout, refreshAccessToken, getServices, serviceData, addAddress, getUserAddresses, addItemToCart, getUserCartForService, updateQuantityCart, placeOrder, fetchBookings, getBookingDetails, fetchAllCarts, getCheckoutDetails, cancelBooking, addReview, fetchCategories, getProfileDetails, updateProfileImage, updateProfileData, getStatsOfUser } from '../controllers/userController.js';
+import { userRegister,userLogin, verifyOtp, resendOtp, userLogout, refreshAccessToken, getServices, serviceData, addAddress, getUserAddresses, addItemToCart, getUserCartForService, updateQuantityCart, placeOrder, fetchBookings, getBookingDetails, fetchAllCarts, getCheckoutDetails, cancelBooking, addReview, fetchCategories, getProfileDetails, updateProfileImage, updateProfileData, getStatsOfUser, forgotPasswordDetails, resetPasswordDetails } from '../controllers/userController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
@@ -17,7 +17,7 @@ router.post("/address",authMiddleware,addAddress);
 router.get("/addresses/:token",authMiddleware,getUserAddresses);
 router.post("/cart",authMiddleware,addItemToCart);
 router.get("/carts",authMiddleware,fetchAllCarts);
-router.get('/cart/:token/:id',authMiddleware,getUserCartForService);
+router.get('/cart/:token/:id',getUserCartForService);
 router.patch("/cart",authMiddleware,updateQuantityCart);
 router.post("/order",authMiddleware,placeOrder);
 router.get("/bookings",authMiddleware,fetchBookings);
@@ -30,6 +30,8 @@ router.get("/profile",authMiddleware,getProfileDetails);
 router.patch("/profile-image",authMiddleware,upload.single('image'),updateProfileImage);
 router.patch("/profile",authMiddleware,updateProfileData);
 router.get("/stats",authMiddleware,getStatsOfUser);
+router.post("/forgot-password",forgotPasswordDetails);
+router.post("/reset-password",resetPasswordDetails);
 
 router.get('/client-id', (req, res) => {
     res.json({ clientId: process.env.PAYPAL_CLIENT_ID });

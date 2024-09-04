@@ -23,6 +23,7 @@ import {
   getUserServicesData,
   placeOrderHelper,
   serviceDataHelper,
+  updatePassword,
   updateProfileImageService,
   updateProfileService,
 } from "../services/userServices.js";
@@ -33,10 +34,13 @@ import {
   generateOtp,
   generateRefreshToken,
   getFile,
+  oneTimeLink,
   randomName,
   refundPayment,
   removeFile,
   sendOtp,
+  sendResetPassword,
+  verifyOneTimeLink,
   verifyToken,
 } from "../utils/utils.js";
 import jwt from "jsonwebtoken";
@@ -93,7 +97,7 @@ const userLogin = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
       let url;
-      if(user.image){
+      if (user.image) {
         url = await getFile(user.image);
       }
       res.status(200).json({
@@ -102,7 +106,7 @@ const userLogin = async (req, res) => {
           name: user.name,
           email: user.email,
           phone: user.phone,
-          url
+          url,
         },
         token: accessToken,
       });
@@ -349,7 +353,7 @@ const updateQuantityCart = async (req, res) => {
         cart.items = cart.items.filter((item) => item.item._id != itemId);
       }
       await cart.save();
-      if(cart.items.length==0){
+      if (cart.items.length == 0) {
         await clearCart(cart._id);
         return res.status(200).json({ message: "Cart deleted successfully" });
       }
@@ -390,9 +394,9 @@ const placeOrder = async (req, res) => {
         for (let employee of employees) {
           const message = `New order has been placed for your service. Order ID: ${order.orderId}`;
           const socketId = getReceiverSocketId(employee._id);
-          if(socketId){
-            io.to(socketId).emit("employee_notification",{
-              message
+          if (socketId) {
+            io.to(socketId).emit("employee_notification", {
+              message,
             });
           }
         }
@@ -459,12 +463,10 @@ const cancelBooking = async (req, res) => {
     if (result) {
       if (result.paymentMethod === "paypal") {
         await refundPayment(result.captureId);
-        return res
-          .status(200)
-          .json({
-            message:
-              "Booking cancelled successfully and payment will be refunded shortly.",
-          });
+        return res.status(200).json({
+          message:
+            "Booking cancelled successfully and payment will be refunded shortly.",
+        });
       }
       return res
         .status(200)
@@ -509,54 +511,94 @@ const getProfileDetails = async (req, res) => {
       const url = await getFile(user.image);
       user.imageUrl = url;
     }
-    res.status(200).json({ name:user.name,email:user.email,phone:user.phone,url:user.imageUrl });
+    res.status(200).json({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      url: user.imageUrl,
+    });
   } catch (error) {
     res.status(404).json({ message: "Error fetching user details" });
   }
 };
 
-const updateProfileImage = async(req,res)=>{
+const updateProfileImage = async (req, res) => {
   try {
     const { id } = req.user;
     const file = req.file;
-    const fileName = randomName(req.file)
+    const fileName = randomName(req.file);
     const result = await updateProfileImageService(id, fileName);
     if (file && result) {
-      if(result.image){
+      if (result.image) {
         await removeFile(result.image);
       }
-      await addFileToS3(file,fileName);
+      await addFileToS3(file, fileName);
     }
     const url = await getFile(fileName);
-    res.status(200).json({url});
+    res.status(200).json({ url });
   } catch (error) {
     res.status(400).json({ message: "Error updating profile image" });
   }
-}
+};
 
-const updateProfileData = async(req,res)=>{
+const updateProfileData = async (req, res) => {
   try {
-    const {id}=req.user;
-    console.log(id,req.body);
-    const result = await updateProfileService(id,req.body);
-    if(result){
-      res.status(200).json({name:result.name,email:result.email,phone:result.phone});
+    const { id } = req.user;
+    console.log(id, req.body);
+    const result = await updateProfileService(id, req.body);
+    if (result) {
+      res
+        .status(200)
+        .json({ name: result.name, email: result.email, phone: result.phone });
     }
   } catch (error) {
-    res.status(400).json({ message: "Error updating profile"});
+    res.status(400).json({ message: "Error updating profile" });
   }
-}
+};
 
-const getStatsOfUser = async (req,res)=>{
+const getStatsOfUser = async (req, res) => {
   try {
-    const {id}=req.user;
+    const { id } = req.user;
     const stats = await getStatsOfUserHelper(id);
-    res.status(200).json({stats});
+    res.status(200).json({ stats });
   } catch (error) {
     res.status(400).json({ message: "Error getting stats" });
   }
-}
+};
 
+const forgotPasswordDetails = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await getUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const link = await oneTimeLink(user);
+    await sendResetPassword({ email: user.email, link });
+    res.status(200).json({ message: "Password reset link sent successfully" });
+  } catch (error) {
+    res.status(400).json({ message: "Error getting forgot password" });
+  }
+};
+
+const resetPasswordDetails = async (req, res) => {
+  try {
+    const { id, token, password } = req.body;
+    const user = await getUserById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const verify = verifyOneTimeLink(token, user);
+    if (!verify) {
+      return res.status(401).json({ message: "Invalid one-time link" });
+    }
+    await updatePassword(user._id, password);
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error resetting password" });
+  }
+};
 
 export {
   userRegister,
@@ -583,5 +625,7 @@ export {
   getProfileDetails,
   updateProfileImage,
   updateProfileData,
-  getStatsOfUser
+  getStatsOfUser,
+  forgotPasswordDetails,
+  resetPasswordDetails,
 };

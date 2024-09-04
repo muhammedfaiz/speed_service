@@ -317,3 +317,14 @@ export const getEmployeeByDesignation = async(designation)=>{
     throw new Error("Failed to get employee by designation");
   }
 }
+
+export const updatePassword = async(id,password)=>{
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    await User.findByIdAndUpdate(id, { $set: { password: hashedPassword } });
+    return;
+  } catch (error) {
+    throw new Error("Failed to update Password");
+  }
+}
