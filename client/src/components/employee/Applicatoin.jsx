@@ -58,7 +58,7 @@ const Application = () => {
         formData.append(key, data[key]);
       }
       const response = await axios.post(
-        "http://localhost:5000/api/employee/apply",
+        "https://api.speedservice.store/api/employee/apply",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -73,14 +73,14 @@ const Application = () => {
   };
 
   return (
-    <section className="max-w-4xl p-6 mx-auto bg-indigo-600 rounded-md shadow-md dark:bg-gray-800">
-      <h1 className="text-xl font-bold text-white capitalize dark:text-white">
+    <section className="max-w-4xl p-6 mx-auto rounded-md shadow-md bg-gray-800">
+      <h1 className="text-xl font-bold capitalize text-white">
         Employee Application
       </h1>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
           <div>
-            <label className="text-white dark:text-gray-200" htmlFor="username">
+            <label className="text-gray-200" htmlFor="username">
               Name
             </label>
             <input
@@ -96,7 +96,7 @@ const Application = () => {
           </div>
 
           <div>
-            <label className="text-white dark:text-gray-200" htmlFor="email">
+            <label className="text-gray-200" htmlFor="email">
               Email Address
             </label>
             <input
@@ -113,7 +113,7 @@ const Application = () => {
 
           <div>
             <label
-              className="text-white dark:text-gray-200"
+              className="text-gray-200"
               htmlFor="designation"
             >
               Designation
@@ -137,7 +137,7 @@ const Application = () => {
           </div>
 
           <div>
-            <label className="text-white dark:text-gray-200" htmlFor="phone">
+            <label className="text-gray-200" htmlFor="phone">
               Phone
             </label>
             <input
@@ -153,7 +153,7 @@ const Application = () => {
           </div>
           <div>
             <label
-              className="text-white dark:text-gray-200"
+              className="text-gray-200"
               htmlFor="experience"
             >
               Experience
@@ -210,7 +210,7 @@ const Application = () => {
           <div>
             <Link
               to="/employee/login"
-              className="inline-flex items-center text-xs font-thin text-center text-gray-500 hover:text-gray-700 dark:text-gray-100 dark:hover:text-white"
+              className="inline-flex items-center text-xs font-thin text-center text-gray-100 hover:text-white"
             >
               <span className="text-base font-semibold">
                 Already providing service?

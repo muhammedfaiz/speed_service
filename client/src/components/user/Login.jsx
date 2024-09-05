@@ -11,7 +11,8 @@ const Login = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {error,isSuccess}=useSelector(store=>store.user);
+  const { error, isSuccess } = useSelector((store) => store.user);
+
   function validation() {
     let errors = {};
     if (!email) {
@@ -31,52 +32,53 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-      const validationError=validation();
-      if(Object.keys(validationError).length>0){
-        setErrors(validationError);
-        return;
-      }else{
-        setErrors({});
-        dispatch(login({email,password}));
-      }
+    const validationError = validation();
+    if (Object.keys(validationError).length > 0) {
+      setErrors(validationError);
+      return;
+    } else {
+      setErrors({});
+      dispatch(login({ email, password }));
+    }
   };
 
-  useEffect(()=>{
-    if(error){
-        toast.error(error.message);
+  useEffect(() => {
+    if (error) {
+      toast.error("Login failed");
     }
-  },[error]);
+  }, [error]);
 
-  useEffect(()=>{
-    if(isSuccess){
-        navigate("/");
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/");
     }
-  },[isSuccess,navigate]);
+  }, [isSuccess, navigate]);
+
   return (
-    <div className="flex flex-col w-full max-w-md px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10">
-      <div className="self-center mb-6 text-xl font-light text-gray-600 sm:text-2xl dark:text-white">
+    <div className="flex flex-col w-full max-w-md px-4 py-8  rounded-lg shadow bg-gray-800">
+      <div className="self-center mb-6 text-xl font-light sm:text-2xl text-white">
         Login To Your Account
       </div>
       <div className="mt-8">
         <div className="flex flex-col mb-2">
-            {errors.email && <p className="text-red-500 text-xs mb-1">{errors.email}</p>}
-          <div className="flex relative ">
+          {errors.email && <p className="text-red-500 text-xs mb-1">{errors.email}</p>}
+          <div className="flex relative">
             <input
               type="text"
               id="sign-in-email"
-              className={`rounded-lg flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 ${errors.email ? "focus:ring-red-600 ring-2 ring-red-600":"focus:ring-blue-600"} focus:border-transparent`}
+              className={`rounded-lg flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 ${errors.email ? "focus:ring-red-600 ring-2 ring-red-600" : "focus:ring-blue-600"} focus:border-transparent`}
               placeholder="Your email"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
         </div>
         <div className="flex flex-col mb-6">
-        {errors.password && <p className="text-red-500 text-xs mb-1">{errors.password}</p>}
-          <div className="flex relative ">
+          {errors.password && <p className="text-red-500 text-xs mb-1">{errors.password}</p>}
+          <div className="flex relative">
             <input
               type="password"
               id="sign-in-password"
-              className={`rounded-lg flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 ${errors.password ? "focus:ring-red-600 ring-2 ring-red-600":"focus:ring-blue-600"} focus:border-transparent`}
+              className={`rounded-lg flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 ${errors.password ? "focus:ring-red-600 ring-2 ring-red-600" : "focus:ring-blue-600"} focus:border-transparent`}
               placeholder="Your password"
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -86,7 +88,7 @@ const Login = () => {
           <div className="flex ml-auto">
             <Link
               to="/forgot-password"
-              className="inline-flex text-xs font-thin text-gray-500 sm:text-sm dark:text-gray-100 hover:text-gray-700 dark:hover:text-white"
+              className="inline-flex text-xs font-thin  sm:text-sm text-gray-100  dark:hover:text-white"
             >
               Forgot Your Password?
             </Link>
@@ -96,7 +98,7 @@ const Login = () => {
           <button
             type="submit"
             onClick={(e) => handleSubmit(e)}
-            className="py-2 px-4  bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-purple-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg "
+            className="py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-purple-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
           >
             Login
           </button>
@@ -105,7 +107,7 @@ const Login = () => {
       <div className="flex items-center justify-center mt-6">
         <Link
           to="/signup"
-          className="inline-flex items-center text-xs font-thin text-center text-gray-500 hover:text-gray-700 dark:text-gray-100 dark:hover:text-white"
+          className="inline-flex items-center text-xs font-thin text-center text-gray-100 hover:text-white"
         >
           <span className="ml-2">You don&#x27;t have an account?</span>
         </Link>
@@ -113,4 +115,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;
