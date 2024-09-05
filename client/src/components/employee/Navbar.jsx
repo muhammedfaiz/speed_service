@@ -142,7 +142,7 @@ const Navbar = () => {
                 </button>
 
                 {profileMenuOpen && (
-                  <div className="absolute right-0 w-56 mt-2 origin-top-right bg-white rounded-md shadow-lg dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="absolute right-0 w-56 mt-2 origin-top-right  rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
                     {employee ? (
                       <div className="py-1" role="menu">
                         <NavLink
