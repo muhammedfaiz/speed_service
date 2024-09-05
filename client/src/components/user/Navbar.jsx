@@ -154,7 +154,7 @@ const Navbar = () => {
                     </div>
                   )}
                   {profileMenuOpen && (
-                    <div className="absolute right-0 w-56 mt-2 origin-top-right bg-white rounded-md shadow-lg dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                    <div className="absolute right-0 w-56 mt-2 origin-top-right rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
                       {user ? (
                         <div
                           className="py-1 "
