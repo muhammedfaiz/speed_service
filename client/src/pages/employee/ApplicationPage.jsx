@@ -3,7 +3,7 @@ import logo from '../../assets/logo-transparent.png';
 
 const ApplicationPage = () => {
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-indigo-950 p-10 h-screen">
+    <div className="bg-gradient-to-r from-blue-500 to-indigo-950 p-10 min-h-screen">
       <div>
             <img src={logo} alt="Logo" className="nav-logo" />
         </div>
