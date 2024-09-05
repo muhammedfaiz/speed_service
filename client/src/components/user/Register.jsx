@@ -69,8 +69,8 @@ const Register = ({setToggle}) => {
   },[user,isSuccess,navigate,error]);
 
   return (
-    <div className="flex flex-col w-full max-w-md px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10">
-      <div className="self-center mb-6 text-xl font-light text-gray-600 sm:text-2xl dark:text-white">
+    <div className="flex flex-col w-full max-w-md px-4 py-8 rounded-lg shadow bg-gray-800 sm:px-6 md:px-8 lg:px-10">
+      <div className="self-center mb-6 text-xl font-light sm:text-2xl text-white">
         Create Your Account
       </div>
       <div className="mt-8">
@@ -149,7 +149,7 @@ const Register = ({setToggle}) => {
       <div className="flex items-center justify-center mt-6">
         <Link
           to="/login"
-          className="inline-flex items-center text-xs font-thin text-center text-gray-500 hover:text-gray-700 dark:text-gray-100 dark:hover:text-white"
+          className="inline-flex items-center text-xs font-thin text-center text-gray-100 hover:text-white"
         >
           <span className="ml-2">You have an account?</span>
         </Link>

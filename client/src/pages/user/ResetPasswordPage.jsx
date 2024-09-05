@@ -7,11 +7,11 @@ const ResetPasswordPage = () => {
     const {id,token}=useParams();
   return (
     <>
-    <div className="bg-gradient-to-r from-sky-900 to-indigo-950 p-10">
+    <div className="bg-gradient-to-r from-sky-900 to-indigo-950 p-10 min-h-screen">
         <div>
             <img src={logo} alt="Logo" className="nav-logo" />
         </div>
-        <div className="m-16 flex items-center justify-center">
+        <div className="lg:m-16 mt-16 flex items-center justify-center">
             <ResetPasswordForm id={id} token={token}/>
         </div>
     </div>

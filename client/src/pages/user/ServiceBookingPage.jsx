@@ -116,7 +116,7 @@ const ServiceBookingPage = () => {
               </p>
             </div>
             <div className="flex justify-between items-center">
-              <p className="text-lg font-semibold">&#x20B9; {service.price}</p>
+              <p className="text-lg font-semibold">$ {service.price}</p>
               <button
                 type="button"
                 className="ring-1 ring-primary-blue text-primary-blue py-2 px-4 rounded-md hover:bg-primary-blue hover:text-white"
@@ -179,7 +179,7 @@ const ServiceBookingPage = () => {
                       </button>
                     </div>
                     <p className="text-base font-normal">
-                      ₹ {item.quantity * item.item.price}
+                      $ {item.quantity * item.item.price}
                     </p>
                   </div>
                 ))}
