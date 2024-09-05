@@ -5,7 +5,7 @@ const LoginPage = () => {
     
   return (
     <>
-    <div className="bg-gradient-to-r from-sky-900 to-indigo-950 p-10">
+    <div className="bg-gradient-to-r from-sky-900 to-indigo-950 h-screen p-10">
         <div>
             <img src={logo} alt="Logo" className="nav-logo" />
         </div>
