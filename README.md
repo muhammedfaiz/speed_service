@@ -12,6 +12,7 @@ A comprehensive home service booking application where users can connect with se
 - [Usage](#usage)
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
+- [Demo](#demo)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -87,7 +88,7 @@ A comprehensive home service booking application where users can connect with se
      npm run dev
      ```
 
-5. Visit `http://localhost:3000` for the frontend and `http://localhost:5000` for the backend.
+5. Visit `http://localhost:5173` for the frontend and `http://localhost:5000` for the backend.
 
 ## Environment Variables
 
@@ -118,6 +119,9 @@ speed_service/
 │
 ├── frontend/           # Frontend application with React
 │   ├── src/
+|   |   ├── utils/      # Utility handlers
+|   |   ├── services/   # Api connection handlers
+|   |   ├── context/    # Context components
 │   │   ├── components/ # Reusable components
 │   │   ├── pages/      # Pages for routing
 │   │   ├── redux/      # State management
@@ -125,6 +129,10 @@ speed_service/
 │   └── ...
 │
 ├── backend/            # Backend API with Node.js and Express
+|   ├── utils/          # Utility functions
+|   ├── socket/         # socket hanlders
+|   ├── middlewares/    # Middleware handlers
+|   ├── services/       # Logical handlers
 │   ├── controllers/    # Request handlers
 │   ├── models/         # Mongoose models
 │   ├── routes/         # API endpoints
@@ -153,6 +161,10 @@ speed_service/
 - **POST** `/api/chat` - Send a new message
 
 *For a complete list of routes, please refer to the codebase.*
+
+## Demo
+
+[![Watch the video](https://res.cloudinary.com/dzsu6hf5v/image/upload/v1730175933/Screenshot_2024-09-25_093708_aoybed.png)](https://res.cloudinary.com/dzsu6hf5v/video/upload/v1729523050/project1_f9y4kp.mp4)
 
 ## Contributing
 
