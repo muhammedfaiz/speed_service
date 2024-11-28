@@ -18,7 +18,7 @@ const Application = () => {
   useEffect(() => {
     const fetchDesignation = async () => {
       const response = await axios.get(
-        "http://localhost:5000/api/employee/categories"
+        "http://api.speedservice.store/api/employee/categories"
       );
       setDesignations(response.data);
     };
